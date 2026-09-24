@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>暮色森林 · 可交互小屋</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
+        body { font-family: 'Nunito', sans-serif; overflow: hidden; }
+        #tooltip {
+            position: absolute;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            opacity: 0;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+            z-index: 10;
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            background: linear-gradient(to bottom, #b5cfd0 0%, #e2e1ca 65%, #789c75 100%);
+            transition: background 2s ease;
+        }
+
+        body.night-mode #canvas-container {
+            background: linear-gradient(to bottom, #0f172a 0%, #1e1b4b 100%); /* Night Sky */
+        }
+
+        /* Custom Cursor? */
+        #canvas-container canvas {
+            cursor: grab;
+        }
+
+        #canvas-container canvas:active {
+            cursor: grabbing;
+        }
+        #webgl-fallback {position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:#f4f0d9;background:radial-gradient(circle at 50% 55%,#769277,#244a42 68%,#152b2c);z-index:1}
+        #webgl-fallback[hidden]{display:none}
+        #webgl-fallback strong{display:block;font-size:clamp(34px,6vw,74px);font-weight:300;letter-spacing:.16em}
+        .forest-ui{background:rgba(20,48,40,.64);backdrop-filter:blur(20px);border:1px solid rgba(236,237,199,.28);border-radius:20px;padding:20px 24px;max-width:300px}
+        .forest-ui h1{font-weight:400;letter-spacing:.12em}
+        .forest-ui p{font-size:13px;margin-top:7px}
+        @media(max-width:700px){.forest-ui{left:16px;bottom:16px;max-width:250px;padding:13px 16px}.forest-ui h1{font-size:20px}.forest-ui p{font-size:11px;margin-top:3px}}
+    </style>
+</head>
+<body class="bg-gray-900 m-0 p-0 w-full h-full">
+    <div id="canvas-container" class="w-full h-screen relative">
+        <div id="webgl-fallback"><div><strong>暮色森林</strong><p>转动视角，去小屋边坐坐。</p></div></div>
+        <!-- Tooltip for tree names -->
+        <div id="tooltip" class="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg border-l-4 border-[#2D5D28]">
+            <p class="text-[#2D5D28] font-bold text-lg" id="tooltip-text">Tree Name</p>
+        </div>
+        
+        <!-- UI Controls / Instructions -->
+        <div class="forest-ui absolute bottom-8 left-8 text-white/80 pointer-events-none select-none z-10">
+            <h1 class="text-3xl text-[#f5ddb0] mb-2">暮色森林</h1>
+            <p>拖动视角 · 滚轮缩放</p>
+            <p>点篝火切换火光 · 点小屋开门</p>
+            <p>按 N 键，换一片夜色</p>
+        </div>
+
+        <!-- Lottie Loading Animation (Optional use) -->
+        <div id="lottie-loader" class="absolute inset-0 bg-[#25473e] flex items-center justify-center z-50 transition-opacity duration-1000">
+            <div id="lottie-container" style="width: 200px; height: 200px;"></div>
+        </div>
+    </div>
+    <script>setTimeout(()=>{const loader=document.getElementById('lottie-loader');if(loader)loader.remove()},2600)</script>
+
+    <!-- Import Map for Three.js -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // --- Configuration ---
+        const COLORS = {
+            ground: 0x648465,
+            groundDark: 0x2D5D28, // Deep forest green
+            wood: 0x8B5A2B,
+            leaves: [0x31584b, 0x547460, 0x8aa280],
+            water: 0x5e9e9f,
+            fire: 0xFF4500,
+            fireYellow: 0xFFE485,
+            smoke: 0xEEEEEE,
+            skyDay: 0xb5cfd0,
+            skyNight: 0x0f172a,
+            lightWarm: 0xFFE485
+        };
+
+        // --- Globals ---
+        let scene, camera, renderer, controls;
+        let raycaster, mouse;
+        let time = 0;
+        let isNight = false;
+
+        // Objects
+        let campfire, fireParticles, fireLight;
+        let cabinDoor, cabinLight;
+        let fireflies;
+        let riverMesh;
+        let smokeParticles;
+        let treeList = [];
+
+        // State
+        let fireState = 1; // 0: off, 1: small, 2: big
+        let isDoorOpen = false;
+
+        // --- Initialization ---
+        function init() {
+            // Scene
+            scene = new THREE.Scene();
+            // Fog for depth (Ghibli style often uses atmospheric perspective)
+            scene.fog = new THREE.FogExp2(0xb5cfd0, 0.018);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(7.5, 5.8, 8.5);
+            camera.lookAt(-1, 1.3, -1);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.SoftShadowMap;
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+            document.getElementById('webgl-fallback').hidden = true;
+
+            // Controls
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.maxPolarAngle = Math.PI / 2 - 0.1; // Don't go below ground
+            controls.minDistance = 2;
+            controls.maxDistance = 30;
+            controls.target.set(-1,1.3,-1);
+
+            // Raycaster
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
+
+            // Lighting
+            setupLights();
+
+            // World Generation
+            createGround();
+            createRiver();
+            createCabin();
+            createCampfire();
+            createForest();
+            createFireflies();
+            createWildflowers();
+
+            // Event Listeners
+            window.addEventListener('resize', onWindowResize);
+            window.addEventListener('pointermove', onPointerMove);
+            window.addEventListener('click', onClick);
+            window.addEventListener('keydown', (e) => {
+                if (e.key.toLowerCase() === 'n') toggleNightMode();
+            });
+
+            // Init Lottie (Loading)
+            initLottie();
+
+            // Start Loop
+            animate();
+        }
+
+        // --- Lottie ---
+        function initLottie() {
+            const loader = document.getElementById('lottie-loader');
+            if (!window.lottie) {loader.remove();return;}
+            lottie.loadAnimation({
+                container: document.getElementById('lottie-container'),
+                renderer: 'svg',
+                loop: true,
+                autoplay: true,
+                path: 'https://lottie.host/56050932-4202-4d5b-b689-242153427471/4Xw0q6eJ9W.json' // Generic nature/loading lottie
+            });
+            
+            // Hide loader after a bit
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.remove(), 1000);
+            }, 2000);
+        }
+
+        // --- Lighting ---
+        let sunLight, ambientLight;
+
+        function setupLights() {
+            ambientLight = new THREE.AmbientLight(0xfff1d5, 0.85);
+            scene.add(ambientLight);
+
+            sunLight = new THREE.DirectionalLight(0xffe4b1, 1.35);
+            sunLight.position.set(50, 100, 50);
+            sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width = 2048;
+            sunLight.shadow.mapSize.height = 2048;
+            scene.add(sunLight);
+        }
+
+        function toggleNightMode() {
+            isNight = !isNight;
+            document.body.classList.toggle('night-mode', isNight);
+
+            if (isNight) {
+                // Night
+                scene.fog.color.setHex(COLORS.skyNight);
+                ambientLight.intensity = 0.1;
+                sunLight.intensity = 0.05;
+                sunLight.color.setHex(0x8888ff); // Moon tint
+                if (cabinLight) cabinLight.intensity = isDoorOpen ? 2 : 0.5; // Window glow if closed? Maybe later
+                fireflies.visible = true;
+            } else {
+                // Day
+                scene.fog.color.setHex(COLORS.skyDay);
+                ambientLight.intensity = 0.85;
+                sunLight.intensity = 1.35;
+                sunLight.color.setHex(0xffffff);
+                fireflies.visible = false;
+            }
+        }
+
+        // --- World Creation ---
+
+        function createGround() {
+            const geom = new THREE.PlaneGeometry(100, 100, 64, 64);
+            
+            // Add bumps
+            const pos = geom.attributes.position;
+            for (let i = 0; i < pos.count; i++) {
+                const x = pos.getX(i);
+                const y = pos.getY(i);
+                // Simple noise approximation
+                const z = Math.sin(x * 0.1) * Math.cos(y * 0.1) * 0.5 + Math.random() * 0.2;
+                pos.setZ(i, z);
+            }
+            geom.computeVertexNormals();
+
+            const mat = new THREE.MeshToonMaterial({ color: COLORS.ground });
+            const ground = new THREE.Mesh(geom, mat);
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+        }
+
+        function createRiver() {
+            // A winding path or straight strip? Let's do a strip for simplicity
+            const geom = new THREE.PlaneGeometry(11, 100, 20, 50);
+            const mat = new THREE.MeshPhongMaterial({ 
+                color: COLORS.water, 
+                shininess: 100, 
+                transparent: true, 
+                opacity: 0.8,
+                side: THREE.DoubleSide
+            });
+            riverMesh = new THREE.Mesh(geom, mat);
+            riverMesh.rotation.x = -Math.PI / 2;
+            riverMesh.position.set(18, 0.1, 0);
+            scene.add(riverMesh);
+        }
+
+        function createCabin() {
+            const cabinGroup = new THREE.Group();
+            
+            // Base
+            const wallsGeom = new THREE.BoxGeometry(4, 3, 4);
+            const woodMat = new THREE.MeshToonMaterial({ color: COLORS.wood });
+            const walls = new THREE.Mesh(wallsGeom, woodMat);
+            walls.position.y = 1.5;
+            walls.castShadow = true;
+            walls.receiveShadow = true;
+            cabinGroup.add(walls);
+
+            // Roof
+            const roofGeom = new THREE.ConeGeometry(3.5, 2, 4);
+            const roofMat = new THREE.MeshToonMaterial({ color: 0x5c3a1e }); // Darker wood
+            const roof = new THREE.Mesh(roofGeom, roofMat);
+            roof.position.y = 4;
+            roof.rotation.y = Math.PI / 4;
+            roof.castShadow = true;
+            cabinGroup.add(roof);
+
+            const windowGlow = new THREE.MeshBasicMaterial({color:0xffd990});
+            const windowFrame = new THREE.MeshToonMaterial({color:0x4b3429});
+            for(const x of [-1.35,1.35]){
+                const frame = new THREE.Mesh(new THREE.BoxGeometry(.92,.94,.12),windowFrame);
+                frame.position.set(x,1.9,2.075);cabinGroup.add(frame);
+                const pane = new THREE.Mesh(new THREE.PlaneGeometry(.7,.72),windowGlow);
+                pane.position.set(x,1.9,2.145);cabinGroup.add(pane);
+                const crossH=new THREE.Mesh(new THREE.BoxGeometry(.78,.065,.1),windowFrame);
+                crossH.position.set(x,1.9,2.19);cabinGroup.add(crossH);
+                const crossV=new THREE.Mesh(new THREE.BoxGeometry(.065,.79,.1),windowFrame);
+                crossV.position.set(x,1.9,2.19);cabinGroup.add(crossV);
+            }
+            const porch=new THREE.Mesh(new THREE.BoxGeometry(4.8,.18,1.45),woodMat);
+            porch.position.set(0,.12,2.6);cabinGroup.add(porch);
+
+            // Door
+            const doorGeom = new THREE.BoxGeometry(1.2, 2, 0.1);
+            const doorMat = new THREE.MeshToonMaterial({ color: 0x3e2713 });
+            
+            const hinge = new THREE.Object3D();
+            hinge.position.set(-0.6, 1, 2.05); // Hinge location
+            cabinGroup.add(hinge);
+            
+            cabinDoor = new THREE.Mesh(doorGeom, doorMat);
+            cabinDoor.position.set(0.6, 0, 0); // Move door center relative to hinge
+            cabinDoor.userData = { type: 'door', parentGroup: hinge };
+            hinge.add(cabinDoor);
+
+            // Interior Light
+            cabinLight = new THREE.PointLight(COLORS.lightWarm, 0, 10);
+            cabinLight.position.set(0, 2, 0);
+            cabinGroup.add(cabinLight);
+
+            // Chimney
+            const chimneyGeom = new THREE.BoxGeometry(0.5, 2, 0.5);
+            const chimneyMat = new THREE.MeshToonMaterial({ color: 0x555555 });
+            const chimney = new THREE.Mesh(chimneyGeom, chimneyMat);
+            chimney.position.set(1.2, 3.5, -1);
+            cabinGroup.add(chimney);
+
+            // Smoke
+            createSmoke(1.2, 4.5, -1);
+
+            cabinGroup.position.set(-2, 0, -3);
+            scene.add(cabinGroup);
+        }
+
+        function createSmoke(x, y, z) {
+            const particleCount = 50;
+            const geom = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            const sizes = new Float32Array(particleCount);
+            
+            for (let i = 0; i < particleCount; i++) {
+                positions[i * 3] = x;
+                positions[i * 3 + 1] = y;
+                positions[i * 3 + 2] = z;
+                sizes[i] = Math.random();
+            }
+            
+            geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geom.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+            
+            // Custom shader for smoke usually better, but PointsMaterial is okay
+            const mat = new THREE.PointsMaterial({
+                color: COLORS.smoke,
+                size: 0.5,
+                transparent: true,
+                opacity: 0.4,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending
+            });
+            
+            smokeParticles = new THREE.Points(geom, mat);
+            smokeParticles.userData = { velocities: [] };
+            for(let i=0; i<particleCount; i++) {
+                smokeParticles.userData.velocities.push({
+                    y: 0.02 + Math.random() * 0.05,
+                    x: (Math.random() - 0.5) * 0.02,
+                    z: (Math.random() - 0.5) * 0.02,
+                    offset: Math.random() * 100
+                });
+            }
+            
+            // Apply offset to cabin position
+            smokeParticles.position.set(-2, 0, -3);
+            scene.add(smokeParticles);
+        }
+
+        function createCampfire() {
+            const group = new THREE.Group();
+            
+            // Logs
+            const logGeom = new THREE.CylinderGeometry(0.1, 0.1, 1, 6);
+            const logMat = new THREE.MeshToonMaterial({ color: 0x5c3a1e });
+            
+            for (let i = 0; i < 3; i++) {
+                const log = new THREE.Mesh(logGeom, logMat);
+                log.rotation.z = Math.PI / 2;
+                log.rotation.y = (i * Math.PI) / 1.5;
+                log.position.y = 0.1;
+                group.add(log);
+            }
+
+            // Hitbox for clicking
+            const hitbox = new THREE.Mesh(
+                new THREE.BoxGeometry(1.5, 1, 1.5),
+                new THREE.MeshBasicMaterial({ visible: false })
+            );
+            hitbox.userData = { type: 'campfire' };
+            group.add(hitbox);
+
+            // Fire Light
+            fireLight = new THREE.PointLight(COLORS.fire, 1, 10);
+            fireLight.position.y = 1;
+            fireLight.castShadow = true;
+            group.add(fireLight);
+
+            // Fire Particles
+            const pCount = 100;
+            const pGeom = new THREE.BufferGeometry();
+            const pPos = new Float32Array(pCount * 3);
+            
+            for(let i=0; i<pCount; i++) {
+                pPos[i*3] = (Math.random() - 0.5) * 0.5;
+                pPos[i*3+1] = Math.random() * 0.5;
+                pPos[i*3+2] = (Math.random() - 0.5) * 0.5;
+            }
+            pGeom.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+            
+            const pMat = new THREE.PointsMaterial({
+                color: COLORS.fire,
+                size: 0.15,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+            
+            fireParticles = new THREE.Points(pGeom, pMat);
+            group.add(fireParticles);
+
+            group.position.set(1.8, 0.1, 2);
+            campfire = group;
+            scene.add(campfire);
+        }
+
+        function createForest() {
+            const treeCount = 72;
+            const treeTypes = ['Pine', 'Oak', 'Birch'];
+            
+            for (let i = 0; i < treeCount; i++) {
+                const type = treeTypes[Math.floor(Math.random() * treeTypes.length)];
+                const tree = createTree(type);
+                
+                // Random pos excluding center area
+                let x, z;
+                do {
+                    x = (Math.random() - 0.5) * 43;
+                    z = (Math.random() - 0.5) * 43;
+                } while ((x > -8 && x < 14 && z > -7 && z < 17) || (Math.abs(x + 2) < 6 && Math.abs(z + 3) < 6));
+                
+                tree.position.set(x, 0, z);
+                
+                // Random scale
+                const scale = 0.8 + Math.random() * 0.5;
+                tree.scale.set(scale, scale, scale);
+                
+                tree.userData = { type: 'tree', name: type + ' Tree' };
+                // Propagate userdata to children for raycasting
+                tree.traverse((child) => {
+                    if (child.isMesh) {
+                        child.userData = { type: 'tree', name: type + ' Tree', parent: tree };
+                    }
+                });
+
+                scene.add(tree);
+                treeList.push(tree);
+            }
+        }
+
+        function createTree(type) {
+            const group = new THREE.Group();
+            
+            // Trunk
+            const trunkGeom = new THREE.CylinderGeometry(0.2, 0.4, 2, 8);
+            const trunkMat = new THREE.MeshToonMaterial({ color: COLORS.wood });
+            const trunk = new THREE.Mesh(trunkGeom, trunkMat);
+            trunk.position.y = 1;
+            group.add(trunk);
+            
+            // Leaves
+            let leavesGeom, leavesMat;
+            leavesMat = new THREE.MeshToonMaterial({ color: COLORS.leaves[Math.floor(Math.random()*3)] });
+
+            if (type === 'Pine') {
+                // Cone layers
+                for(let j=0; j<3; j++) {
+                    const cone = new THREE.Mesh(
+                        new THREE.ConeGeometry(1.5 - j*0.3, 2, 8),
+                        leavesMat
+                    );
+                    cone.position.y = 2 + j * 1.2;
+                    group.add(cone);
+                }
+            } else {
+                // Round blob
+                const sphere = new THREE.Mesh(
+                    new THREE.DodecahedronGeometry(1.5, 0),
+                    leavesMat
+                );
+                sphere.position.y = 2.5;
+                group.add(sphere);
+            }
+            
+            return group;
+        }
+
+        function createFireflies() {
+            const count = 50;
+            const geom = new THREE.BufferGeometry();
+            const pos = new Float32Array(count * 3);
+            
+            for(let i=0; i<count; i++) {
+                pos[i*3] = (Math.random() - 0.5) * 40;
+                pos[i*3+1] = 1 + Math.random() * 3;
+                pos[i*3+2] = (Math.random() - 0.5) * 40;
+            }
+            
+            geom.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            const mat = new THREE.PointsMaterial({
+                color: 0xccff00,
+                size: 0.2,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+            
+            fireflies = new THREE.Points(geom, mat);
+            fireflies.userData = { offsets: [] };
+            for(let i=0; i<count; i++) fireflies.userData.offsets.push(Math.random() * 100);
+            
+            fireflies.visible = false; // Hidden by default (day)
+            scene.add(fireflies);
+        }
+
+        function createWildflowers() {
+            const blossom = new THREE.SphereGeometry(.085,6,6);
+            const colors=[0xf7deac,0xf3b9b4,0xd8e8d0];
+            const materials=colors.map(color=>new THREE.MeshToonMaterial({color}));
+            for(let i=0;i<180;i++){
+                const x=(Math.random()-.5)*31;
+                const z=(Math.random()-.5)*30;
+                if((Math.abs(x+2)<3&&Math.abs(z+3)<3)||(Math.abs(x-1.8)<1.4&&Math.abs(z-2)<1.4))continue;
+                const flower=new THREE.Mesh(blossom,materials[i%materials.length]);
+                flower.position.set(x,.16,z);
+                flower.scale.setScalar(.65+Math.random()*.9);
+                scene.add(flower);
+            }
+        }
+
+        // --- Interactions ---
+
+        function onPointerMove(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            // Check hover
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(scene.children, true);
+            
+            const tooltip = document.getElementById('tooltip');
+            const tooltipText = document.getElementById('tooltip-text');
+            
+            let hoveredTree = false;
+            
+            for (let hit of intersects) {
+                // Check tree
+                if (hit.object.userData.type === 'tree' || (hit.object.parent && hit.object.parent.userData.type === 'tree')) {
+                    const name = hit.object.userData.name || hit.object.parent.userData.name;
+                    tooltipText.innerText = name;
+                    tooltip.style.opacity = '1';
+                    tooltip.style.left = event.clientX + 'px';
+                    tooltip.style.top = event.clientY + 'px';
+                    hoveredTree = true;
+                    
+                    // Optional: Highlight effect (emissive)
+                    if (hit.object.material && hit.object.material.emissive) {
+                        // Reset others? Too expensive. Just a simple text tooltip for now.
+                    }
+                    break;
+                }
+            }
+            
+            if (!hoveredTree) {
+                tooltip.style.opacity = '0';
+            }
+        }
+
+        function onClick(event) {
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(scene.children, true);
+            
+            for (let hit of intersects) {
+                // Campfire
+                if (hit.object.userData.type === 'campfire' || (hit.object.parent && hit.object.parent.userData.type === 'campfire')) {
+                    fireState = (fireState + 1) % 3;
+                    updateFire();
+                    return;
+                }
+                
+                // Door
+                if (hit.object.userData.type === 'door') {
+                    toggleDoor(hit.object.userData.parentGroup); // Pass the hinge
+                    return;
+                }
+            }
+        }
+
+        function updateFire() {
+            if (fireState === 0) { // Off
+                fireParticles.visible = false;
+                fireLight.intensity = 0;
+            } else if (fireState === 1) { // Small
+                fireParticles.visible = true;
+                fireParticles.material.size = 0.15;
+                fireLight.intensity = 1;
+                fireLight.distance = 10;
+            } else { // Big
+                fireParticles.visible = true;
+                fireParticles.material.size = 0.3;
+                fireLight.intensity = 2;
+                fireLight.distance = 15;
+            }
+        }
+
+        function toggleDoor(hinge) {
+            isDoorOpen = !isDoorOpen;
+            
+            // Simple animation logic in update loop, or target rotation
+            const target = isDoorOpen ? -Math.PI / 2 : 0;
+            
+            // Use a custom property to animate in loop
+            hinge.userData.targetRotation = target;
+            
+            // Play sound (simulated with console/alert for now, user can't hear it but logic is there)
+            console.log("Creak...");
+            
+            if (isNight && cabinLight) {
+                cabinLight.intensity = isDoorOpen ? 2 : 0.5;
+            }
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // --- Animation Loop ---
+
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        let lastRenderedAt = 0;
+        function animate(timestamp = 0) {
+            requestAnimationFrame(animate);
+            if (document.hidden) return;
+            if (reducedMotion.matches && timestamp - lastRenderedAt < 50) return;
+            lastRenderedAt = timestamp;
+            time += 0.01;
+            
+            controls.update();
+            
+            // River Animation
+            if (riverMesh) {
+                const pos = riverMesh.geometry.attributes.position;
+                for(let i=0; i<pos.count; i++) {
+                    const x = pos.getX(i);
+                    const y = pos.getY(i); // actually z in world
+                    // Wave
+                    const z = Math.sin(x * 0.5 + time) * 0.2 + Math.cos(y * 0.5 + time) * 0.2;
+                    pos.setZ(i, z);
+                }
+                pos.needsUpdate = true;
+            }
+            
+            // Fire Particles
+            if (fireState > 0 && fireParticles) {
+                const positions = fireParticles.geometry.attributes.position;
+                for(let i=0; i<positions.count; i++) {
+                    let y = positions.getY(i);
+                    y += 0.02 * fireState; // Speed based on state
+                    if (y > (fireState * 0.8)) y = 0;
+                    positions.setY(i, y);
+                    
+                    // Jitter x/z
+                    positions.setX(i, positions.getX(i) + (Math.random()-0.5)*0.01);
+                    positions.setZ(i, positions.getZ(i) + (Math.random()-0.5)*0.01);
+                }
+                positions.needsUpdate = true;
+                
+                // Flicker light
+                fireLight.intensity = (fireState === 1 ? 1 : 2) + (Math.random() - 0.5) * 0.2;
+            }
+            
+            // Smoke Particles
+            if (smokeParticles) {
+                const pos = smokeParticles.geometry.attributes.position;
+                const vels = smokeParticles.userData.velocities;
+                for(let i=0; i<pos.count; i++) {
+                    let x = pos.getX(i);
+                    let y = pos.getY(i);
+                    let z = pos.getZ(i);
+                    
+                    y += vels[i].y;
+                    x += Math.sin(time + vels[i].offset) * 0.01;
+                    z += Math.cos(time + vels[i].offset) * 0.01;
+                    
+                    // Reset
+                    if (y > 4.5 + 3) { // Start y is 4.5
+                        y = 4.5;
+                        x = 1.2; // reset to chimney x
+                        z = -1; // reset to chimney z
+                    }
+                    
+                    pos.setXYZ(i, x, y, z);
+                }
+                pos.needsUpdate = true;
+            }
+            
+            // Fireflies
+            if (isNight && fireflies) {
+                const pos = fireflies.geometry.attributes.position;
+                const offsets = fireflies.userData.offsets;
+                for(let i=0; i<pos.count; i++) {
+                    let x = pos.getX(i);
+                    let y = pos.getY(i);
+                    let z = pos.getZ(i);
+                    
+                    x += Math.sin(time + offsets[i]) * 0.02;
+                    y += Math.cos(time * 0.5 + offsets[i]) * 0.02;
+                    z += Math.sin(time * 0.3 + offsets[i]) * 0.02;
+                    
+                    pos.setXYZ(i, x, y, z);
+                }
+                pos.needsUpdate = true;
+            }
+            
+            // Door Animation
+            if (cabinDoor && cabinDoor.parent) { // hinge
+                const hinge = cabinDoor.parent;
+                if (hinge.userData.targetRotation !== undefined) {
+                    hinge.rotation.y += (hinge.userData.targetRotation - hinge.rotation.y) * 0.1;
+                }
+            }
+
+            // Tree Sway
+            treeList.forEach((tree, index) => {
+                const offset = index; // Different phase for each tree
+                tree.rotation.z = Math.sin(time * 0.5 + offset) * 0.02;
+                tree.rotation.x = Math.cos(time * 0.3 + offset) * 0.02;
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        init();
+    </script>
+</body>
+</html>

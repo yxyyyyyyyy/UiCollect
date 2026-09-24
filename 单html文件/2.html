@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D海底珊瑚礁生态探索平台 - 实时渲染</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <style>
+        body { margin: 0; overflow: hidden; background: #071e34; user-select: none; font-family: -apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif; }
+        #webgl-fallback { position: absolute; inset: 0; display: grid; place-items: center; background: radial-gradient(circle at 52% 43%, #137f8b 0%, #073e57 36%, #06182d 84%); text-align: center; color: #e4fbff; }
+        #webgl-fallback[hidden] { display: none; }
+        #webgl-fallback::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(112deg,transparent 0 100px,rgba(166,247,239,.04) 103px 108px,transparent 112px 220px); }
+        #webgl-fallback strong { position: relative; font-size: clamp(34px,6vw,84px); letter-spacing: .14em; font-weight: 300; }
+        #webgl-fallback p { position: relative; color: #acd9dc; font-size: 14px; letter-spacing: .16em; }
+        .reef-title { position: absolute; top: 36px; left: 44px; z-index: 40; pointer-events: none; }
+        .reef-title small { color: #91dcd9; font-size: 11px; letter-spacing: .3em; }
+        .reef-title h1 { margin: 8px 0; color: #edfcfa; font-size: clamp(34px,4vw,58px); font-weight: 300; letter-spacing: .11em; }
+        .reef-title p { color: #b3dbdd; font-size: 13px; letter-spacing: .11em; }
+        @media(max-width:700px){.reef-title{top:20px;left:20px}.reef-title p{max-width:230px}#photo-btn{right:18px;bottom:100px}}
+        /* UI 动画效果 */
+        .info-bubble {
+            position: absolute;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(10px);
+            backdrop-filter: blur(12px);
+            z-index: 50;
+        }
+        .info-bubble.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="relative w-full h-screen text-white overflow-hidden font-sans">
+
+    <div id="webgl-fallback"><div><strong>珊瑚海</strong><p>轻轻转动视角，去看看海底。</p></div></div>
+    <div id="canvas-container" class="w-full h-full block"></div>
+    <div class="reef-title"><small>REEF / INTERACTIVE OCEAN</small><h1>潜入珊瑚海</h1><p>转动视角，寻找藏在礁石里的小鱼。</p></div>
+
+    <div class="absolute top-0 left-0 w-full p-6 flex justify-between items-start pointer-events-none z-40">
+        <div style="visibility:hidden">
+            <h1 class="text-4xl font-extrabold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-[#00D2D3] to-[#FF6B9D] drop-shadow-lg" style="text-shadow: 0 2px 10px rgba(0,210,211,0.3);">
+                REEF<span class="text-white">OS</span>
+            </h1>
+            <div class="flex items-center gap-2 mt-2">
+                <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                <p class="text-xs text-[#00D2D3] uppercase tracking-widest">Live Simulation</p>
+            </div>
+        </div>
+        
+        <div class="bg-black/20 border border-white/10 p-4 rounded-xl backdrop-blur-md pointer-events-auto hover:bg-black/30 transition-colors">
+            <p class="text-xs text-gray-300 font-mono mb-1">操作方式</p>
+            <div class="space-y-1 text-xs">
+                <div class="flex items-center gap-2"><span class="bg-white/20 px-1 rounded">左键</span> <span>旋转视角</span></div>
+                <div class="flex items-center gap-2"><span class="bg-white/20 px-1 rounded">滚轮</span> <span>缩放距离</span></div>
+                <div class="flex items-center gap-2"><span class="bg-[#FF6B9D]/80 px-1 rounded text-white">点击</span> <span>鱼群互动</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex items-center gap-6 bg-[#001e2e]/80 px-8 py-4 rounded-full border border-[#00D2D3]/20 shadow-2xl backdrop-blur-xl z-40 hover:scale-105 transition-transform duration-300">
+        <span class="text-xs font-bold text-[#00D2D3] tracking-wider">海水清晰度</span>
+        <input type="range" id="turbidity-slider" min="0" max="100" value="50" class="w-64 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-[#FF6B9D]">
+        <span class="text-xs text-gray-400">清澈 — 朦胧</span>
+    </div>
+
+    <button id="photo-btn" class="absolute bottom-10 right-10 w-14 h-14 rounded-full bg-gradient-to-br from-[#FF6B9D] to-[#ff4757] shadow-lg flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-40 group">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white group-hover:rotate-12 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+    </button>
+
+    <div id="info-bubble" class="info-bubble bg-black/60 border-l-4 border-[#FF6B9D] p-4 rounded-r-lg max-w-xs shadow-2xl">
+        <h3 id="info-title" class="text-white font-bold text-lg mb-1 tracking-wide">OBJECT</h3>
+        <p id="info-desc" class="text-gray-300 text-xs leading-relaxed font-light">Description...</p>
+    </div>
+
+    <script>
+        // === 1. 初始化场景 ===
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        const COLORS = { blue: 0x073449, pink: 0xec708a, green: 0x2fae9e, sand: 0x204451 };
+
+        // 雾效：模拟深海可见度
+        scene.background = new THREE.Color(COLORS.blue);
+        scene.fog = new THREE.FogExp2(COLORS.blue, 0.012);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(0, 7, 21);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(renderer.domElement);
+        document.getElementById('webgl-fallback').hidden = true;
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.maxPolarAngle = Math.PI / 2 - 0.1;
+        controls.minDistance = 5;
+        controls.maxDistance = 40;
+
+        // === 2. 灯光 ===
+        const ambientLight = new THREE.HemisphereLight(0xb1e6e3, 0x09263b, 0.68);
+        scene.add(ambientLight);
+
+        const sunLight = new THREE.DirectionalLight(0xbce9e0, 1.05);
+        sunLight.position.set(10, 30, 10);
+        sunLight.castShadow = true;
+        sunLight.shadow.mapSize.width = 2048;
+        sunLight.shadow.mapSize.height = 2048;
+        scene.add(sunLight);
+
+        // 海床
+        const planeGeo = new THREE.PlaneGeometry(90, 90, 64, 64);
+        // 简单的顶点置换做一点起伏
+        const posAttribute = planeGeo.attributes.position;
+        for ( let i = 0; i < posAttribute.count; i ++ ) {
+            const z = posAttribute.getZ( i );
+            const x = posAttribute.getX( i );
+            const y = posAttribute.getY( i );
+            // 简单的波浪地形
+            posAttribute.setZ( i, z + Math.sin(x * 0.1) * Math.cos(y * 0.1) * 2 );
+        }
+        planeGeo.computeVertexNormals();
+
+        const planeMat = new THREE.MeshStandardMaterial({ 
+            color: COLORS.sand, 
+            roughness: 1,
+            metalness: 0,
+            flatShading: true 
+        });
+        const plane = new THREE.Mesh(planeGeo, planeMat);
+        plane.rotation.x = -Math.PI / 2;
+        plane.receiveShadow = true;
+        scene.add(plane);
+
+        const rockMaterials = [0x406271,0x607884,0x345663].map(color => new THREE.MeshStandardMaterial({color,roughness:.96,flatShading:true}));
+        for(let i=0;i<54;i++){
+            const x=(Math.random()-.5)*28;
+            const z=(Math.random()-.5)*24;
+            const rock=new THREE.Mesh(new THREE.IcosahedronGeometry(.35+Math.random()*.8,0),rockMaterials[i%3]);
+            rock.position.set(x,.1,z);
+            rock.scale.set(1.4,.42,1);
+            rock.rotation.y=Math.random()*Math.PI;
+            rock.castShadow=true;
+            scene.add(rock);
+        }
+
+        // === 3. 生态生成 ===
+        const corals = [];
+        const fishes = [];
+        const bubbles = [];
+
+        function createCoral(x, z, type) {
+            const group = new THREE.Group();
+            group.position.set(x, 0, z);
+            
+            // 随机调整地形高度适配
+            group.position.y = Math.sin(x * 0.1) * Math.cos(z * 0.1) * 2; 
+
+            if (type === 'brain') {
+                const geo = new THREE.IcosahedronGeometry(Math.random()*0.5 + 0.5, 1);
+                const mat = new THREE.MeshStandardMaterial({ color: COLORS.pink, roughness: 0.4 });
+                const mesh = new THREE.Mesh(geo, mat);
+                mesh.castShadow = true;
+                group.add(mesh);
+                group.userData = { 
+                    type: 'coral', 
+                    name: 'Brain Coral (脑珊瑚)', 
+                    desc: '属于石珊瑚目，表面有类似大脑沟回的纹路。它们生长缓慢，非常坚固。' 
+                };
+            } else {
+                const mat = new THREE.MeshStandardMaterial({ color: COLORS.green, roughness: 0.6 });
+                for(let i=0; i<6; i++) {
+                    const h = Math.random() * 1.5 + 0.5;
+                    const geo = new THREE.CylinderGeometry(0.04, 0.08, h, 6);
+                    geo.translate(0, h/2, 0);
+                    const branch = new THREE.Mesh(geo, mat);
+                    branch.rotation.x = (Math.random() - 0.5) * 0.5;
+                    branch.rotation.z = (Math.random() - 0.5) * 0.5;
+                    branch.castShadow = true;
+                    group.add(branch);
+                }
+                group.userData = { 
+                    type: 'coral', 
+                    name: 'Staghorn Coral (鹿角珊瑚)', 
+                    desc: '分枝状生长，像鹿角一样。是许多小型热带鱼的天然避难所，对水质很敏感。' 
+                };
+            }
+            scene.add(group);
+            corals.push(group);
+        }
+
+        function createFish(type) {
+            const group = new THREE.Group();
+            const color = type === 'clown' ? 0xFFA500 : 0xFFFF00;
+            
+            // 极简低多边形鱼
+            const bodyGeo = new THREE.ConeGeometry(0.15, 0.5, 8);
+            bodyGeo.rotateX(Math.PI/2);
+            const mat = new THREE.MeshPhongMaterial({ color: color, flatShading: true });
+            const body = new THREE.Mesh(bodyGeo, mat);
+            
+            const tailGeo = new THREE.ConeGeometry(0.1, 0.25, 4);
+            tailGeo.rotateX(-Math.PI/2);
+            const tail = new THREE.Mesh(tailGeo, mat);
+            tail.position.z = 0.3;
+
+            group.add(body, tail);
+            
+            // 随机位置
+            const rX = (Math.random() - 0.5) * 30;
+            const rZ = (Math.random() - 0.5) * 30;
+            group.position.set(rX, Math.random() * 4 + 1, rZ);
+
+            group.userData = {
+                type: 'fish',
+                name: type === 'clown' ? 'Clownfish (小丑鱼)' : 'Butterflyfish (蝶鱼)',
+                desc: type === 'clown' ? '著名的共生鱼类，体表黏液能保护它们免受海葵毒刺的伤害。' : '色彩艳丽，通常成对游动，喜欢在珊瑚礁周围啄食藻类。',
+                velocity: new THREE.Vector3((Math.random()-0.5)*0.08, 0, (Math.random()-0.5)*0.08)
+            };
+            scene.add(group);
+            fishes.push(group);
+        }
+
+        // 生成物体
+        for(let i=0; i<95; i++) createCoral((Math.random()-0.5)*27, (Math.random()-0.5)*24, Math.random()>0.52?'brain':'staghorn');
+        for(let i=0; i<55; i++) createFish(Math.random()>0.5?'clown':'butterfly');
+
+        // === 4. 交互逻辑 ===
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        const infoBubble = document.getElementById('info-bubble');
+
+        function updateRaycaster(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+        }
+
+        window.addEventListener('mousemove', (e) => {
+            updateRaycaster(e);
+            // 珊瑚悬停检测
+            const intersects = raycaster.intersectObjects(corals, true);
+            
+            // 重置所有珊瑚缩放
+            corals.forEach(c => { if(c.scale.x > 1) c.scale.lerp(new THREE.Vector3(1,1,1), 0.1); });
+
+            if (intersects.length > 0) {
+                const coral = intersects[0].object.parent;
+                if (coral.userData.type === 'coral') {
+                    coral.scale.setScalar(1.2); // 放大
+                    showInfo(e.clientX, e.clientY, coral.userData);
+                    document.body.style.cursor = 'pointer';
+                    return;
+                }
+            }
+            hideInfo();
+            document.body.style.cursor = 'default';
+        });
+
+        window.addEventListener('click', (e) => {
+            updateRaycaster(e);
+            const intersects = raycaster.intersectObjects(fishes, true);
+            if(intersects.length > 0) {
+                const fish = intersects[0].object.parent;
+                // 惊吓效果
+                fish.userData.velocity.multiplyScalar(6);
+                fish.userData.velocity.y = (Math.random()-0.5) * 0.2;
+                spawnBubbles(fish.position);
+                showInfo(e.clientX, e.clientY, fish.userData);
+            }
+        });
+
+        function spawnBubbles(pos) {
+            const geo = new THREE.SphereGeometry(0.05, 4, 4);
+            const mat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 });
+            for(let i=0; i<5; i++) {
+                const b = new THREE.Mesh(geo, mat);
+                b.position.copy(pos).add(new THREE.Vector3((Math.random()-0.5)*0.5, 0, (Math.random()-0.5)*0.5));
+                scene.add(b);
+                bubbles.push({ mesh: b, speed: Math.random() * 0.05 + 0.02 });
+            }
+        }
+
+        function showInfo(x, y, data) {
+            infoBubble.classList.add('active');
+            infoBubble.style.left = (x + 20) + 'px';
+            infoBubble.style.top = (y + 20) + 'px';
+            document.getElementById('info-title').innerText = data.name;
+            document.getElementById('info-desc').innerText = data.desc;
+        }
+        function hideInfo() {
+            infoBubble.classList.remove('active');
+        }
+
+        // === 5. UI 控制 ===
+        document.getElementById('turbidity-slider').addEventListener('input', (e) => {
+            scene.fog.density = 0.005 + (e.target.value / 100) * 0.06;
+        });
+
+        document.getElementById('photo-btn').addEventListener('click', () => {
+            renderer.render(scene, camera);
+            const link = document.createElement('a');
+            link.download = 'reef_exploration.png';
+            link.href = renderer.domElement.toDataURL('image/png');
+            link.click();
+        });
+
+        // === 6. 动画循环 ===
+        const clock = new THREE.Clock();
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        let lastRenderedAt = 0;
+        function animate(timestamp = 0) {
+            requestAnimationFrame(animate);
+            if (document.hidden) return;
+            if (reducedMotion.matches && timestamp - lastRenderedAt < 50) return;
+            lastRenderedAt = timestamp;
+            const delta = clock.getDelta();
+            const time = clock.getElapsedTime();
+
+            controls.update();
+
+            // 鱼游动
+            fishes.forEach(fish => {
+                fish.position.add(fish.userData.velocity);
+                fish.lookAt(fish.position.clone().add(fish.userData.velocity));
+                
+                // 边界反弹
+                if(fish.position.length() > 25) fish.userData.velocity.multiplyScalar(-1);
+                
+                // 速度恢复
+                if(fish.userData.velocity.length() > 0.05) fish.userData.velocity.multiplyScalar(0.95);
+            });
+
+            // 气泡上升
+            for(let i=bubbles.length-1; i>=0; i--) {
+                const b = bubbles[i];
+                b.mesh.position.y += b.speed;
+                if(b.mesh.position.y > 15) {
+                    scene.remove(b.mesh);
+                    bubbles.splice(i,1);
+                }
+            }
+            
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

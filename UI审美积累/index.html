@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f5efe7">
+  <meta name="description" content="YXY 的前端作品集：把做过的界面、动效、3D 和数据页面整理在一起，随时可以打开看看。">
+  <title>YXY · 前端视觉作品集</title>
+  <link rel="icon" type="image/png" href="assets/images/brand/yxy-visual-logo.png">
+  <link rel="stylesheet" href="assets/css/common.css">
+  <link rel="stylesheet" href="assets/css/showcase.css?v=20260924-5">
+  <link rel="stylesheet" href="assets/css/showcase-v2.css?v=20260925-1">
+</head>
+<body>
+  <div class="portfolio-shell">
+    <aside class="portfolio-sidebar" aria-label="作品集介绍与筛选">
+      <a class="brand-lockup" href="#top" aria-label="返回作品集顶部">
+        <span class="brand-logo-frame"><img src="assets/images/brand/yxy-visual-logo.png" alt="YXY 原创视觉 logo"></span>
+        <span class="brand-copy"><strong>YXY / 我的前端收藏</strong><small>FRONTEND NOTES</small></span>
+      </a>
+      <div class="sidebar-intro">
+        <img class="sidebar-watermark" src="assets/images/brand/yxy-visual-logo.png" alt="" aria-hidden="true">
+        <div class="sidebar-intro-content">
+          <p class="sidebar-kicker">前端作品集 / 2026</p>
+          <h1 id="heroTitle">我把喜欢的界面， <em>都认真做了一遍。</em></h1>
+          <p>做过的页面都在这里。点开图片，就能看到真正运行的界面。</p>
+          <div class="sidebar-stats"><strong id="worksCount">43</strong><span>件作品 · 持续更新</span></div>
+        </div>
+      </div>
+      <div class="sidebar-tools">
+        <label class="search-field"><span class="search-mark" aria-hidden="true"></span><input type="search" id="searchInput" placeholder="搜索作品" aria-label="搜索作品"></label>
+        <p class="sidebar-filter-title">按类型浏览</p>
+        <nav id="categoryNav" class="category-nav" aria-label="作品分类">
+          <button class="category-button active" data-category="all"><span>全部作品</span><b data-count-for="all">43</b></button>
+          <button class="category-button" data-category="ui"><span>界面设计</span><b data-count-for="ui">0</b></button>
+          <button class="category-button" data-category="dashboard"><span>数据看板</span><b data-count-for="dashboard">0</b></button>
+          <button class="category-button" data-category="spatial"><span>3D / 空间</span><b data-count-for="spatial">0</b></button>
+          <button class="category-button" data-category="motion"><span>动效交互</span><b data-count-for="motion">0</b></button>
+          <button class="category-button" data-category="creative"><span>创意视觉</span><b data-count-for="creative">0</b></button>
+          <button class="category-button" data-category="mobile"><span>移动设计</span><b data-count-for="mobile">0</b></button>
+        </nav>
+      </div>
+      <p class="sidebar-note">从视觉稿到能打开的页面。<br>这里记着我的练习，也记着我的偏爱。</p>
+    </aside>
+
+    <main id="top" class="portfolio-main">
+      <section id="archive" class="archive-section" aria-labelledby="archiveTitle">
+        <div class="archive-heading"><div><h2 id="archiveTitle" class="section-index">我的页面收藏</h2><p id="gallerySectionDesc" class="archive-subtitle">从完整界面到小小的交互实验，都能直接打开体验。</p></div><div class="archive-status"><span class="proof-dot"></span> 每张图都是页面真实运行后的样子</div></div>
+        <div id="mobileCategoryNav" class="mobile-category-nav" aria-label="移动端作品分类"></div>
+        <div class="archive-meta"><span id="gallerySectionBadge">43 件作品</span><span>点开作品，看看真实页面</span><button class="archive-download" onclick="downloadAllAsZip()">下载 HTML 入口</button></div>
+        <div id="cardsGrid" class="archive-grid"></div>
+      </section>
+    </main>
+  </div>
+
+  <aside id="portfolioAssistant" class="portfolio-assistant" aria-label="YXY 的 AI 看板娘" data-pose="idle">
+    <p id="assistantBubble" class="assistant-bubble" aria-live="polite">欢迎来看我的作品</p>
+    <button id="assistantMinimize" class="assistant-minimize" type="button" aria-label="收起看板娘" title="收起看板娘">×</button>
+    <button id="assistantToggle" class="assistant-figure" type="button" aria-label="和看板娘打招呼，也可以拖动" aria-expanded="true" title="拖动我，或者点一下">
+      <span class="assistant-images" aria-hidden="true">
+        <img class="assistant-pose is-active" data-assistant-pose="idle" src="assets/images/brand/assistant/assistant-idle.png" alt="">
+        <img class="assistant-pose" data-assistant-pose="wave" src="assets/images/brand/assistant/assistant-wave.png" alt="">
+        <img class="assistant-pose" data-assistant-pose="wink" src="assets/images/brand/assistant/assistant-wink.png" alt="">
+        <img class="assistant-pose" data-assistant-pose="stand" src="assets/images/brand/assistant/assistant-stand.png" alt="">
+      </span>
+      <span class="assistant-mini" aria-hidden="true"><img src="assets/images/brand/assistant/assistant-idle.png" alt=""></span>
+    </button>
+  </aside>
+
+  <div id="previewModal" class="preview-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
+    <div class="modal-window">
+      <div class="modal-header-bar"><div class="modal-left-meta"><span class="brand-badge-modal">实时预览</span><span id="modalTitle" class="modal-page-title">页面预览</span></div><div class="viewport-controls" aria-label="预览尺寸"><button class="vp-btn active" onclick="setViewport('desktop', this)">桌面</button><button class="vp-btn" onclick="setViewport('laptop', this)">笔记本</button><button class="vp-btn" onclick="setViewport('tablet', this)">平板</button><button class="vp-btn" onclick="setViewport('mobile', this)">手机</button></div><div class="modal-right-actions"><button class="btn-modal-download" onclick="downloadModalCurrentPage()">下载 HTML</button><a id="modalOpenExternal" class="btn-modal-open" href="#" target="_blank" rel="noopener">新窗口打开</a><button class="btn-modal-close" onclick="closePreviewModal()" title="关闭预览" aria-label="关闭预览">×</button></div></div>
+      <div class="modal-notice" id="modalNotice" hidden></div>
+      <div class="modal-frame-viewport"><iframe id="modalIframe" class="device-frame vp-desktop" title="作品实时预览" src="about:blank"></iframe><div id="modalFallback" class="modal-fallback" hidden><strong>这个实验需要独立窗口运行</strong><p>如果预览区域没有响应，可以使用“新窗口打开”。</p></div></div>
+    </div>
+  </div>
+
+  <script src="assets/js/jszip.min.js"></script><script src="assets/js/portfolio-data.js?v=20260925-1"></script><script src="assets/js/portfolio-settings.js?v=20260924-7"></script><script src="assets/js/gallery-layout.js?v=20260924-1"></script><script src="assets/js/showcase.js?v=20260924-12"></script>
+</body>
+</html>

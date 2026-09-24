@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soft Clay UI Design - Full Set</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #DDEBF8;
+            color: #4A5568;
+            /* 允许页面整体滚动 */
+            overflow-x: hidden;
+        }
+
+        /* 隐藏容器内的滚动条但允许滚动 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* 核心样式：Claymorphism 卡片 */
+        .clay-card {
+            background: #F0F6FF;
+            border-radius: 1.5rem;
+            /* 双重阴影：深色阴影 + 白色高光 */
+            box-shadow: 
+                8px 8px 16px #c5d6e8, 
+                -8px -8px 16px #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        /* 凸起的按钮 */
+        .clay-btn {
+            background: #F0F6FF;
+            border-radius: 1rem;
+            box-shadow: 
+                5px 5px 10px #c5d6e8, 
+                -5px -5px 10px #ffffff;
+            transition: all 0.2s ease;
+        }
+        .clay-btn:active {
+            box-shadow: 
+                inset 3px 3px 6px #c5d6e8, 
+                inset -3px -3px 6px #ffffff;
+            transform: scale(0.98);
+        }
+        
+        /* 圆形按钮 */
+        .clay-btn-circle {
+            background: #F0F6FF;
+            border-radius: 50%;
+            box-shadow: 
+                5px 5px 10px #c5d6e8, 
+                -5px -5px 10px #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 凹陷效果 */
+        .clay-inset {
+            background: #F0F6FF;
+            border-radius: 1rem;
+            box-shadow: 
+                inset 5px 5px 10px #c5d6e8, 
+                inset -5px -5px 10px #ffffff;
+        }
+
+        /* 玻璃拟态 */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        /* 手机模型 */
+        .phone-mockup {
+            box-shadow: 20px 20px 50px rgba(0,0,0,0.1), -10px -10px 40px rgba(255,255,255,0.8);
+            background-color: #EAF3FA;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-10 flex flex-col items-center">
+
+    <h1 class="text-3xl font-bold text-gray-700 mb-8 opacity-50 tracking-widest">SOFT CLAY UI KIT</h1>
+
+    <!-- 容器：2行4列，响应式布局 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-[1600px] w-full">
+
+        <!-- 1. Wallet / Dashboard -->
+        <div class="phone-mockup w-full aspect-[9/19] rounded-[2.5rem] overflow-hidden flex flex-col p-6 relative">
+            <div class="flex justify-between items-start mb-6 shrink-0">
+                <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-md">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="avatar">
+                </div>
+                <button class="w-8 h-8 clay-btn-circle text-gray-400"><i class="fas fa-chevron-right text-xs"></i></button>
+            </div>
+            
+            <!-- Scrollable Content -->
+            <div class="flex-1 overflow-y-auto no-scrollbar pb-4">
+                <div class="mb-6">
+                    <h1 class="text-3xl font-extrabold text-gray-700">$ 4,890.00</h1>
+                    <div class="flex items-center gap-2 mt-2">
+                        <div class="w-6 h-4 bg-gradient-to-r from-orange-300 to-red-300 rounded relative shadow-sm">
+                            <div class="absolute w-2 h-2 bg-white/50 rounded-full top-1 left-1"></div>
+                        </div>
+                        <span class="text-xs font-bold text-gray-400">Platinum</span>
+                    </div>
+                </div>
+
+                <div class="flex justify-between mb-8 px-1">
+                    <div class="flex flex-col items-center gap-2">
+                        <button class="w-12 h-12 clay-btn flex items-center justify-center text-orange-400 text-lg"><i class="fas fa-heart"></i></button>
+                        <span class="text-[9px] font-bold text-gray-500">Favorites</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2">
+                        <button class="w-12 h-12 clay-btn flex items-center justify-center text-green-400 text-lg"><i class="fas fa-tag"></i></button>
+                        <span class="text-[9px] font-bold text-gray-500">20% Off</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2">
+                        <button class="w-12 h-12 clay-btn flex items-center justify-center text-red-400 text-lg"><i class="fas fa-shopping-bag"></i></button>
+                        <span class="text-[9px] font-bold text-gray-500">Shop</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2">
+                        <button class="w-12 h-12 clay-btn flex items-center justify-center text-blue-400 text-lg"><i class="fas fa-trophy"></i></button>
+                        <span class="text-[9px] font-bold text-gray-500">Rewards</span>
+                    </div>
+                </div>
+
+                <h3 class="font-bold text-gray-700 mb-4 ml-1">Summary</h3>
+                <div class="space-y-4">
+                    <div class="clay-card p-3 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center text-white shadow-lg"><i class="fas fa-shopping-cart text-xs"></i></div>
+                        <div class="flex-1"><h4 class="text-sm font-bold text-gray-700">V&C Market</h4><p class="text-[10px] text-gray-400">Market</p></div>
+                        <span class="text-sm font-bold text-gray-700">- 50.00</span>
+                    </div>
+                    <div class="clay-card p-3 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center text-white shadow-lg"><i class="fas fa-home text-xs"></i></div>
+                        <div class="flex-1"><h4 class="text-sm font-bold text-gray-700">Rent</h4><p class="text-[10px] text-gray-400">Home Services</p></div>
+                        <span class="text-sm font-bold text-gray-700">- 1200.00</span>
+                    </div>
+                    <div class="clay-card p-3 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center text-white shadow-lg"><i class="fas fa-tree text-xs"></i></div>
+                        <div class="flex-1"><h4 class="text-sm font-bold text-gray-700">Splash Park</h4><p class="text-[10px] text-gray-400">Travel</p></div>
+                        <span class="text-sm font-bold text-gray-700">- 20.20</span>
+                    </div>
+                     <div class="clay-card p-3 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center text-white shadow-lg"><i class="fas fa-gas-pump text-xs"></i></div>
+                        <div class="flex-1"><h4 class="text-sm font-bold text-gray-700">Fuel</h4><p class="text-[10px] text-gray-400">Transport</p></div>
+                        <span class="text-sm font-bold text-gray-700">- 45.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Statistics -->
+        <div class="phone-mockup w-full aspect-[9/19] rounded-[2.5rem] overflow-hidden flex flex-col p-6 relative">
+            <div class="flex items-center gap-2 mb-4 shrink-0">
+                <button class="w-8 h-8 clay-btn-circle text-gray-400"><i class="fas fa-chevron-left text-xs"></i></button>
+                <h2 class="text-xl font-extrabold text-gray-700">Statistics <span class="text-green-400 text-xs align-top">●</span></h2>
+            </div>
+            
+            <!-- Scrollable -->
+            <div class="flex-1 overflow-y-auto no-scrollbar pb-4">
+                <div class="mb-6">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm text-xs font-bold text-gray-500">
+                        <span>October 20</span>
+                        <i class="fas fa-chevron-down text-[10px]"></i>
+                    </div>
+                </div>
+
+                <div class="h-40 flex items-end justify-between px-2 mb-8 gap-2">
+                    <div class="w-full bg-blue-100 rounded-t-lg relative h-2/5"><div class="absolute bottom-0 w-full h-full bg-gradient-to-t from-blue-200 to-blue-300 rounded-lg"></div></div>
+                    <div class="w-full bg-purple-100 rounded-t-lg relative h-3/5"><div class="absolute bottom-0 w-full h-full bg-gradient-to-t from-purple-200 to-purple-300 rounded-lg"></div></div>
+                    <div class="w-full bg-pink-100 rounded-t-lg relative h-4/5"><div class="absolute bottom-0 w-full h-full bg-gradient-to-t from-pink-300 to-rose-300 rounded-lg shadow-md shadow-pink-200"></div></div>
+                    <div class="w-full bg-blue-100 rounded-t-lg relative h-2/5"><div class="absolute bottom-0 w-full h-full bg-gradient-to-t from-blue-200 to-blue-300 rounded-lg"></div></div>
+                    <div class="w-full bg-cyan-100 rounded-t-lg relative h-3/5"><div class="absolute bottom-0 w-full h-full bg-gradient-to-t from-cyan-200 to-cyan-300 rounded-lg"></div></div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 mb-6">
+                    <div class="flex flex-col items-center gap-2">
+                        <button class="w-full aspect-square clay-btn flex items-center justify-center text-purple-400 text-2xl"><i class="fas fa-magic"></i></button>
+                        <span class="text-[9px] font-bold text-gray-500">Magic wand</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2">
+                        <button class="w-full aspect-square clay-btn flex items-center justify-center text-cyan-400 text-2xl"><i class="fas fa-broom"></i></button>
+                        <span class="text-[9px] font-bold text-gray-500">Clear cache</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2">
+                        <button class="w-full aspect-square clay-btn flex items-center justify-center text-green-400 text-2xl"><i class="fas fa-comment-dots"></i></button>
+                        <span class="text-[9px] font-bold text-gray-500">Feedback</span>
+                    </div>
+                </div>
+
+                <div class="clay-card p-3 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-green-400 flex items-center justify-center text-white shadow-lg"><i class="fas fa-tree"></i></div>
+                    <div class="flex-1"><h4 class="text-sm font-bold text-gray-700">Splash Park</h4><p class="text-[10px] text-gray-400">Travel</p></div>
+                    <span class="text-sm font-bold text-gray-700">- 20.20</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. My Cards (New) -->
+        <div class="phone-mockup w-full aspect-[9/19] rounded-[2.5rem] overflow-hidden flex flex-col p-6 relative">
+             <div class="flex justify-between items-center mb-4 shrink-0">
+                <h2 class="text-xl font-extrabold text-gray-700">My Cards</h2>
+                <div class="w-8 h-8 rounded-full overflow-hidden border border-white">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="avatar">
+                </div>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto no-scrollbar pb-4">
+                <p class="text-[10px] text-gray-400 mb-2">Personal Loan Selection</p>
+                
+                <!-- Big Card -->
+                <div class="clay-card p-5 mb-6 relative overflow-hidden h-40 flex flex-col justify-between">
+                    <div class="absolute inset-0 bg-gradient-to-br from-indigo-50 to-pink-50 opacity-50"></div>
+                    <div class="absolute top-[-20px] right-[-20px] w-24 h-24 bg-pink-200 rounded-full blur-xl opacity-60"></div>
+                    <div class="relative z-10 flex justify-between items-start">
+                         <h3 class="text-2xl font-bold text-gray-700">130.99 $</h3>
+                         <div class="flex gap-1">
+                             <div class="w-6 h-6 rounded-full bg-yellow-300 opacity-80"></div>
+                             <div class="w-6 h-6 rounded-full bg-red-400 opacity-80 -ml-3"></div>
+                         </div>
+                    </div>
+                    <div class="relative z-10">
+                        <p class="text-[10px] text-gray-400 tracking-widest mb-1">0000 2300 0090 0000</p>
+                        <p class="text-[10px] text-gray-400">05/26</p>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="flex gap-2 mb-6">
+                    <div class="clay-card px-3 py-2 flex items-center gap-2 text-xs font-bold text-gray-600">Type of Operation <i class="fas fa-chevron-down text-[10px]"></i></div>
+                    <div class="clay-card px-3 py-2 flex items-center gap-2 text-xs font-bold text-gray-600">Period <i class="fas fa-chevron-down text-[10px]"></i></div>
+                </div>
+
+                <div class="flex justify-between items-end mb-4">
+                    <h3 class="font-bold text-gray-700">Yesterday</h3>
+                    <span class="text-[10px] text-blue-400 cursor-pointer">See More</span>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="clay-card p-3 flex items-center gap-3">
+                         <div class="w-10 h-10 rounded-xl bg-yellow-100 text-yellow-500 font-bold flex items-center justify-center text-sm">AE</div>
+                        <div class="flex-1"><h4 class="text-sm font-bold text-gray-700">African & Eastern</h4><p class="text-[10px] text-gray-400">Drinks</p></div>
+                        <span class="text-sm font-bold text-gray-700">- 50.200</span>
+                    </div>
+                    <div class="clay-card p-3 flex items-center gap-3">
+                         <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-500 font-bold flex items-center justify-center text-sm">PP</div>
+                        <div class="flex-1"><h4 class="text-sm font-bold text-gray-700">PayPal</h4><p class="text-[10px] text-gray-400">Other Services</p></div>
+                        <span class="text-sm font-bold text-gray-700">- 50.200</span>
+                    </div>
+                    <div class="clay-card p-3 flex items-center gap-3">
+                         <div class="w-10 h-10 rounded-xl bg-green-100 text-green-500 font-bold flex items-center justify-center text-sm">TB</div>
+                        <div class="flex-1"><h4 class="text-sm font-bold text-gray-700">Toibar</h4><p class="text-[10px] text-gray-400">Food</p></div>
+                        <span class="text-sm font-bold text-gray-700">- 50.200</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Profile (New) -->
+        <div class="phone-mockup w-full aspect-[9/19] rounded-[2.5rem] overflow-hidden flex flex-col p-6 relative">
+            <div class="flex-1 overflow-y-auto no-scrollbar pb-4 flex flex-col items-center pt-4">
+                <div class="relative mb-3">
+                    <div class="w-20 h-20 rounded-full border-4 border-white shadow-lg overflow-hidden">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Craig" alt="avatar">
+                    </div>
+                    <div class="absolute bottom-0 right-0 w-6 h-6 bg-red-400 rounded-full border-2 border-white flex items-center justify-center text-white text-[10px]"><i class="fas fa-pen"></i></div>
+                </div>
+                <h2 class="text-lg font-extrabold text-gray-700 mb-8">Craig Ray</h2>
+
+                <!-- Grid Menu -->
+                <div class="grid grid-cols-4 gap-4 w-full mb-8">
+                    <div class="flex flex-col items-center gap-1">
+                        <button class="w-12 h-12 clay-btn flex items-center justify-center text-blue-500"><i class="fas fa-truck text-sm"></i></button>
+                        <span class="text-[9px] font-bold text-gray-500">Delivery</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-1">
+                        <button class="w-12 h-12 clay-btn flex items-center justify-center text-green-500"><i class="fas fa-hotel text-sm"></i></button>
+                        <span class="text-[9px] font-bold text-gray-500">Hotels</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-1">
+                        <button class="w-12 h-12 clay-btn flex items-center justify-center text-red-500"><i class="fas fa-bus text-sm"></i></button>
+                        <span class="text-[9px] font-bold text-gray-500">Transport</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-1">
+                        <button class="w-12 h-12 clay-btn flex items-center justify-center text-purple-500"><i class="fas fa-film text-sm"></i></button>
+                        <span class="text-[9px] font-bold text-gray-500">Entertain</span>
+                    </div>
+                     <div class="flex flex-col items-center gap-1">
+                        <button class="w-12 h-12 clay-btn flex items-center justify-center text-indigo-500"><i class="fas fa-map-marked-alt text-sm"></i></button>
+                        <span class="text-[9px] font-bold text-gray-500">Map</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-1">
+                        <button class="w-12 h-12 clay-btn flex items-center justify-center text-gray-500"><i class="fas fa-newspaper text-sm"></i></button>
+                        <span class="text-[9px] font-bold text-gray-500">News</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-1">
+                        <button class="w-12 h-12 clay-btn flex items-center justify-center text-cyan-500"><i class="fas fa-map-pin text-sm"></i></button>
+                        <span class="text-[9px] font-bold text-gray-500">Nearby</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-1">
+                        <button class="w-12 h-12 clay-btn flex items-center justify-center text-orange-500"><i class="fas fa-question text-sm"></i></button>
+                        <span class="text-[9px] font-bold text-gray-500">Help</span>
+                    </div>
+                </div>
+
+                <!-- Map Widget -->
+                <div class="w-full h-40 clay-card overflow-hidden relative p-0">
+                     <img src="https://maps.googleapis.com/maps/api/staticmap?center=40.714728,-73.998672&zoom=12&size=400x200&style=feature:all|element:all|saturation:-100|lightness:30&key=" class="w-full h-full object-cover opacity-60">
+                     <div class="absolute inset-0 flex items-center justify-center">
+                         <div class="w-8 h-8 rounded-full bg-blue-500 border-2 border-white shadow-lg animate-bounce"></div>
+                     </div>
+                     <div class="absolute bottom-4 left-4 right-4 h-10 clay-inset flex items-center px-3 bg-white/80 backdrop-blur-sm">
+                         <i class="fas fa-search text-gray-400 text-xs mr-2"></i>
+                         <span class="text-xs text-gray-400">Search cafes, etc...</span>
+                         <i class="fas fa-search text-gray-400 text-xs ml-auto"></i>
+                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Calendar / August (New) -->
+        <div class="phone-mockup w-full aspect-[9/19] rounded-[2.5rem] overflow-hidden flex flex-col p-6 relative">
+            <div class="flex justify-between items-start mb-6 shrink-0">
+                <div>
+                     <p class="text-xs text-gray-400 font-bold">Today</p>
+                     <h2 class="text-2xl font-extrabold text-gray-700">August</h2>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto no-scrollbar pb-4">
+                <!-- Calendar Row -->
+                <div class="flex justify-between mb-8">
+                    <div class="flex flex-col items-center gap-2"><span class="text-[10px] text-gray-400">20</span><span class="text-xs font-bold text-gray-500">M</span></div>
+                    <div class="flex flex-col items-center gap-2"><span class="text-[10px] text-gray-400">21</span><span class="text-xs font-bold text-gray-500">T</span></div>
+                    <div class="flex flex-col items-center gap-2"><span class="text-[10px] text-gray-400">22</span><span class="text-xs font-bold text-gray-500">W</span></div>
+                    <div class="flex flex-col items-center gap-2"><span class="text-[10px] text-gray-400">23</span><span class="text-xs font-bold text-gray-500">T</span></div>
+                    <div class="flex flex-col items-center gap-2">
+                        <span class="text-[10px] text-gray-400">24</span>
+                        <div class="w-8 h-8 rounded-full bg-green-400 text-white flex items-center justify-center text-xs font-bold shadow-lg shadow-green-200">25</div>
+                    </div>
+                    <div class="flex flex-col items-center gap-2"><span class="text-[10px] text-gray-400">26</span><span class="text-xs font-bold text-gray-500">S</span></div>
+                    <div class="flex flex-col items-center gap-2"><span class="text-[10px] text-gray-400">27</span><span class="text-xs font-bold text-gray-500">S</span></div>
+                </div>
+
+                <!-- Timeline -->
+                <div class="space-y-4 relative">
+                    <div class="absolute left-[7px] top-2 bottom-0 w-[2px] bg-gray-200"></div>
+                    
+                    <div class="flex gap-4 relative">
+                         <div class="w-4 h-4 rounded-full border-2 border-blue-200 bg-white shrink-0 z-10"></div>
+                         <div class="clay-card p-3 flex-1 flex items-center gap-3">
+                             <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-500 flex items-center justify-center font-bold text-xs">Zoom</div>
+                             <div>
+                                 <h4 class="text-xs font-bold text-gray-700">Zoom Call with Michael</h4>
+                                 <p class="text-[9px] text-gray-400">09:00 - 10:00</p>
+                             </div>
+                         </div>
+                    </div>
+
+                    <div class="flex gap-4 relative">
+                         <div class="w-4 h-4 rounded-full border-2 border-green-200 bg-white shrink-0 z-10"></div>
+                         <div class="clay-card p-3 flex-1 flex items-center gap-3">
+                             <div class="w-10 h-10 rounded-xl bg-green-400 text-white flex items-center justify-center font-bold text-xs"><i class="fas fa-check"></i></div>
+                             <div>
+                                 <h4 class="text-xs font-bold text-gray-700">GQA Website</h4>
+                                 <p class="text-[9px] text-gray-400">Microsoft Teams Meeting</p>
+                                 <p class="text-[9px] text-gray-400">12:00 - 14:00</p>
+                             </div>
+                         </div>
+                    </div>
+
+                    <div class="flex gap-4 relative">
+                         <div class="w-4 h-4 rounded-full border-2 border-pink-200 bg-white shrink-0 z-10"></div>
+                         <div class="clay-card p-3 flex-1 flex items-center gap-3">
+                             <div class="w-10 h-10 rounded-xl bg-pink-300 text-white flex items-center justify-center font-bold text-xs"><i class="fas fa-briefcase"></i></div>
+                             <div>
+                                 <h4 class="text-xs font-bold text-gray-700">Briefing part 1</h4>
+                                 <p class="text-[9px] text-gray-400">14:00 - 16:00</p>
+                             </div>
+                         </div>
+                    </div>
+
+                     <div class="flex gap-4 relative">
+                         <div class="w-4 h-4 rounded-full border-2 border-yellow-200 bg-white shrink-0 z-10"></div>
+                         <div class="clay-card p-3 flex-1 flex items-center gap-3">
+                             <div class="w-10 h-10 rounded-xl bg-yellow-200 text-white flex items-center justify-center font-bold text-xs"><i class="fas fa-briefcase"></i></div>
+                             <div>
+                                 <h4 class="text-xs font-bold text-gray-700">Briefing part 2</h4>
+                                 <p class="text-[9px] text-gray-400">17:00 - 17:20</p>
+                             </div>
+                         </div>
+                    </div>
+                </div>
+
+                <button class="w-full mt-6 bg-gradient-to-r from-purple-400 to-indigo-400 text-white font-bold py-3 rounded-xl shadow-lg shadow-purple-200">Plan My Day</button>
+            </div>
+        </div>
+
+        <!-- 6. Weather -->
+        <div class="phone-mockup w-full aspect-[9/19] rounded-[2.5rem] overflow-hidden flex flex-col p-6 relative">
+             <div class="flex justify-between items-center mb-6 shrink-0">
+                <button class="w-8 h-8 rounded-full clay-btn flex items-center justify-center text-gray-400"><i class="fas fa-chevron-left text-xs"></i></button>
+                <div class="flex gap-1">
+                     <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                     <div class="w-2 h-2 rounded-full bg-blue-400"></div>
+                     <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto no-scrollbar pb-4 flex flex-col items-center">
+                 <div class="w-32 h-32 rounded-full bg-gradient-to-br from-yellow-300 to-orange-400 shadow-[0_10px_20px_rgba(255,165,0,0.4)] flex items-center justify-center mb-6 relative z-10 shrink-0">
+                    <div class="w-24 h-24 rounded-full bg-gradient-to-tl from-yellow-300 to-orange-300"></div>
+                    <div class="absolute -right-4 top-16 text-6xl text-white/90 drop-shadow-lg"><i class="fas fa-cloud"></i></div>
+                    <div class="absolute -left-6 top-4 text-4xl text-white/80 drop-shadow-md"><i class="fas fa-cloud"></i></div>
+                </div>
+                
+                <h1 class="text-5xl font-extrabold text-gray-700">20°</h1>
+                <h2 class="text-sm font-bold text-gray-500 mt-1">Saint Petersburg</h2>
+                <p class="text-[10px] text-gray-400 mt-1">Mostly Sunny H:16° L:12°</p>
+
+                <div class="w-full mt-6 clay-inset h-10 flex items-center px-4 gap-3 text-gray-400 mb-6 shrink-0">
+                    <i class="fas fa-search text-xs"></i><span class="text-xs">Search places</span>
+                </div>
+
+                <div class="w-full">
+                    <h3 class="text-xs font-bold text-gray-400 mb-3 ml-1">Upcoming event</h3>
+                    <div class="flex gap-4">
+                        <div class="w-1/2 glass-panel p-4 rounded-3xl flex flex-col justify-between h-32 relative overflow-hidden">
+                             <div class="absolute -right-4 -top-4 w-16 h-16 bg-blue-200 rounded-full blur-xl opacity-60"></div>
+                             <div class="w-8 h-10 border-l-4 border-blue-400 pl-2">
+                                 <div class="text-[10px] font-bold text-gray-400">10:00</div>
+                                 <div class="text-[10px] font-bold text-gray-400">11:00</div>
+                             </div>
+                             <div><h4 class="text-xs font-bold text-gray-700">Design catch up</h4></div>
+                        </div>
+
+                        <div class="w-1/2 glass-panel p-4 rounded-3xl flex flex-col justify-between h-32 relative overflow-hidden">
+                             <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-green-200 rounded-full blur-xl opacity-60"></div>
+                             <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center text-white shadow-lg mb-2"><i class="fas fa-music"></i></div>
+                             <div><h4 class="text-xs font-bold text-gray-700">My playlist</h4></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full mt-6">
+                    <h3 class="text-xs font-bold text-gray-400 mb-3 ml-1">Today's program</h3>
+                    <div class="flex gap-2">
+                        <div class="h-16 w-16 rounded-xl bg-gradient-to-br from-indigo-400 to-purple-400 shadow-md"></div>
+                        <div class="h-16 w-16 rounded-xl bg-gradient-to-br from-purple-400 to-pink-400 shadow-md"></div>
+                        <div class="h-16 w-16 rounded-xl bg-gradient-to-br from-orange-300 to-yellow-300 shadow-md"></div>
+                    </div>
+                </div>
+            </div>
+            
+             <div class="mt-auto clay-card p-2 rounded-2xl flex justify-around items-center shrink-0">
+                 <button class="w-10 h-10 rounded-xl bg-blue-400 text-white flex items-center justify-center shadow-lg"><i class="fas fa-home"></i></button>
+                 <button class="w-10 h-10 text-gray-400"><i class="fas fa-chart-bar"></i></button>
+                 <button class="w-10 h-10 text-gray-400"><i class="fas fa-wallet"></i></button>
+                 <button class="w-10 h-10 text-gray-400"><i class="fas fa-user"></i></button>
+            </div>
+        </div>
+
+        <!-- 7. Stats Circle (New) -->
+        <div class="phone-mockup w-full aspect-[9/19] rounded-[2.5rem] overflow-hidden flex flex-col p-6 relative">
+            <div class="flex items-center justify-between mb-4 shrink-0">
+                <h2 class="text-xl font-extrabold text-gray-700">Stats</h2>
+                <button class="w-8 h-8 rounded-full clay-btn flex items-center justify-center text-gray-400"><i class="fas fa-chevron-right text-xs"></i></button>
+            </div>
+             <p class="text-xs text-gray-400 font-bold mb-6">August 2020</p>
+
+            <div class="flex-1 overflow-y-auto no-scrollbar pb-4 flex flex-col">
+                <div class="flex justify-between mb-8">
+                    <div class="clay-card px-4 py-2 text-center">
+                         <span class="text-[10px] text-gray-400 block">Income</span>
+                         <span class="text-xs font-bold text-gray-700">- 50.20 <span class="text-red-400">▼</span></span>
+                    </div>
+                     <div class="clay-card px-4 py-2 text-center">
+                         <span class="text-[10px] text-gray-400 block">Outcome</span>
+                         <span class="text-xs font-bold text-gray-700">+ 1200.00</span>
+                    </div>
+                     <div class="clay-card px-4 py-2 text-center">
+                         <span class="text-[10px] text-gray-400 block">Rent</span>
+                         <span class="text-xs font-bold text-gray-700">- 20.20</span>
+                    </div>
+                </div>
+
+                <!-- Big Circle Chart -->
+                <div class="relative w-56 h-56 mx-auto clay-card rounded-full flex items-center justify-center mb-10 shrink-0">
+                    <div class="absolute inset-0 rounded-full border-[20px] border-white/50"></div>
+                    <!-- CSS Conic Gradient for chart segments -->
+                    <div class="absolute inset-0 rounded-full" style="background: conic-gradient(#4ADE80 0% 30%, transparent 30% 60%, #3B82F6 60% 100%); mask: radial-gradient(transparent 55%, black 56%); -webkit-mask: radial-gradient(transparent 55%, black 56%);"></div>
+                    
+                    <!-- Inner shadow/depth -->
+                    <div class="w-32 h-32 rounded-full clay-inset flex items-center justify-center">
+                        <span class="text-2xl font-bold text-green-500">30%</span>
+                    </div>
+                    <!-- Floating segment -->
+                     <div class="absolute top-0 right-0 w-24 h-24 bg-green-400 rounded-full blur-md opacity-20"></div>
+                </div>
+            </div>
+
+            <div class="mt-auto flex justify-between px-4">
+                 <button class="w-12 h-12 clay-btn flex items-center justify-center text-gray-400"><i class="fas fa-lock"></i></button>
+                 <button class="w-12 h-12 clay-btn-circle bg-green-400 text-white shadow-lg shadow-green-200"><i class="fas fa-clock"></i></button>
+                 <button class="w-12 h-12 clay-btn flex items-center justify-center text-gray-400"><i class="fas fa-comment"></i></button>
+                 <button class="w-12 h-12 clay-btn flex items-center justify-center text-gray-400"><i class="fas fa-bell"></i></button>
+            </div>
+        </div>
+
+        <!-- 8. Chat / Job -->
+        <div class="phone-mockup w-full aspect-[9/19] rounded-[2.5rem] overflow-hidden flex flex-col p-6 relative">
+            <div class="flex items-center justify-between mb-4 shrink-0">
+                <button class="w-8 h-8 flex items-center justify-center text-gray-400"><i class="fas fa-chevron-left"></i></button>
+                <div class="text-center">
+                    <h2 class="font-bold text-gray-700">My job</h2>
+                    <p class="text-[10px] text-green-500 font-bold">12 online</p>
+                </div>
+                <div class="w-8"></div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto no-scrollbar space-y-4 pt-2 pb-4">
+                 <div class="flex gap-3">
+                     <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=John" class="w-8 h-8 rounded-full border border-white shadow-sm self-end">
+                     <div class="clay-card rounded-tl-2xl rounded-tr-2xl rounded-br-2xl p-3 max-w-[80%] text-xs text-gray-600 leading-relaxed">
+                         Europe preparing to fully open borders
+                         <span class="block text-[8px] text-gray-400 text-right mt-1">09:20</span>
+                     </div>
+                </div>
+                <div class="flex gap-3">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah" class="w-8 h-8 rounded-full border border-white shadow-sm self-end">
+                    <div class="clay-card rounded-tl-2xl rounded-tr-2xl rounded-br-2xl p-3 max-w-[80%] text-xs text-gray-600 leading-relaxed">
+                        The link was updated as below along with some enhancements
+                        <span class="block text-[8px] text-gray-400 text-right mt-1">10:01</span>
+                    </div>
+               </div>
+                <div class="flex gap-3">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Mike" class="w-8 h-8 rounded-full border border-white shadow-sm self-end">
+                    <div class="clay-card rounded-tl-2xl rounded-tr-2xl rounded-br-2xl p-3 max-w-[80%] text-xs text-gray-600 leading-relaxed">
+                        Please review the updated homepage
+                        <span class="block text-[8px] text-gray-400 text-right mt-1">10:02</span>
+                    </div>
+               </div>
+               <div class="flex gap-3 justify-end">
+                    <div class="bg-gradient-to-r from-blue-400 to-cyan-400 rounded-tl-2xl rounded-tr-2xl rounded-bl-2xl p-3 max-w-[80%] text-xs text-white leading-relaxed shadow-lg shadow-blue-200">
+                        That's great news!
+                        <span class="block text-[8px] text-blue-100 text-right mt-1"><i class="fas fa-check-double"></i> 10:03</span>
+                    </div>
+                     <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Me" class="w-8 h-8 rounded-full border border-white shadow-sm self-end">
+               </div>
+            </div>
+
+            <div class="mt-2 relative shrink-0">
+                <div class="clay-inset h-12 flex items-center px-2 gap-2">
+                    <button class="w-8 h-8 rounded-full bg-purple-100 text-purple-400 flex items-center justify-center"><i class="fas fa-camera text-xs"></i></button>
+                    <button class="w-8 h-8 rounded-full bg-blue-100 text-blue-400 flex items-center justify-center"><i class="fas fa-microphone text-xs"></i></button>
+                    <input type="text" placeholder="iMessage" class="bg-transparent flex-1 text-xs outline-none text-gray-600 pl-2">
+                    <button class="w-8 h-8 rounded-full bg-green-400 text-white flex items-center justify-center shadow-md"><i class="fas fa-arrow-up text-xs"></i></button>
+                </div>
+                <div class="mt-4 bg-[#D1D9E6] p-2 rounded-2xl mx-[-10px] mb-[-10px]">
+                    <div class="flex justify-center gap-1 mb-2">
+                        <span class="w-8 h-10 bg-white rounded flex items-center justify-center text-xs font-bold shadow-sm">Q</span><span class="w-8 h-10 bg-white rounded flex items-center justify-center text-xs font-bold shadow-sm">W</span><span class="w-8 h-10 bg-white rounded flex items-center justify-center text-xs font-bold shadow-sm">E</span><span class="w-8 h-10 bg-white rounded flex items-center justify-center text-xs font-bold shadow-sm">R</span><span class="w-8 h-10 bg-white rounded flex items-center justify-center text-xs font-bold shadow-sm">T</span><span class="w-8 h-10 bg-white rounded flex items-center justify-center text-xs font-bold shadow-sm">Y</span><span class="w-8 h-10 bg-white rounded flex items-center justify-center text-xs font-bold shadow-sm">U</span><span class="w-8 h-10 bg-white rounded flex items-center justify-center text-xs font-bold shadow-sm">I</span>
+                    </div>
+                     <div class="flex justify-center gap-1">
+                        <span class="w-8 h-10 bg-white rounded flex items-center justify-center text-xs font-bold shadow-sm">A</span><span class="w-8 h-10 bg-white rounded flex items-center justify-center text-xs font-bold shadow-sm">S</span><span class="w-8 h-10 bg-white rounded flex items-center justify-center text-xs font-bold shadow-sm">D</span><span class="w-8 h-10 bg-white rounded flex items-center justify-center text-xs font-bold shadow-sm">F</span><span class="w-8 h-10 bg-white rounded flex items-center justify-center text-xs font-bold shadow-sm">G</span><span class="w-8 h-10 bg-white rounded flex items-center justify-center text-xs font-bold shadow-sm">H</span><span class="w-8 h-10 bg-white rounded flex items-center justify-center text-xs font-bold shadow-sm">J</span>
+                    </div>
+                    <div class="w-32 h-1 bg-gray-400 rounded-full mx-auto mt-4 opacity-50"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

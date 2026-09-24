@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>声控烟花互动</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #050505;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+        }
+        canvas {
+            display: block;
+        }
+        #ui-layer {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+        }
+        h1 {
+            font-size: 18px;
+            margin: 0 0 10px 0;
+            font-weight: normal;
+            letter-spacing: 1px;
+        }
+        .control-group {
+            margin-bottom: 10px;
+        }
+        label {
+            font-size: 12px;
+            display: block;
+            margin-bottom: 5px;
+            color: #aaa;
+        }
+        input[type=range] {
+            width: 100%;
+            cursor: pointer;
+        }
+        #start-btn {
+            background: linear-gradient(45deg, #ff0055, #ff5500);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.1s;
+            outline: none;
+            width: 100%;
+        }
+        #start-btn:active {
+            transform: scale(0.95);
+        }
+        #start-btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+        #status {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #00ff88;
+        }
+        .instruction {
+            position: absolute;
+            bottom: 30px;
+            width: 100%;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+            pointer-events: none;
+            opacity: 0.8;
+            font-family: 'KaiTi', 'SimKai', serif; /* 模仿视频字体风格 */
+        }
+        body { background: #090d20; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+        body::before { content: ''; position: fixed; inset: 0; pointer-events: none; background: radial-gradient(circle at 68% 35%, rgba(82, 58, 151, .3), transparent 30%), radial-gradient(circle at 24% 66%, rgba(28, 71, 110, .22), transparent 37%), linear-gradient(180deg, #10142b, #070b18 75%); }
+        canvas { position: fixed; inset: 0; width: 100%; height: 100%; cursor: crosshair; }
+        .masthead { position: absolute; z-index: 2; left: clamp(24px, 6vw, 90px); top: clamp(30px, 8vh, 96px); max-width: 510px; pointer-events: none; }
+        .eyebrow { color: #f1bca9; font-size: 11px; font-weight: 700; letter-spacing: .34em; }
+        .masthead h1 { margin: 20px 0 14px; font-size: clamp(44px, 6vw, 88px); line-height: 1.13; font-weight: 600; letter-spacing: -.07em; text-shadow: 0 10px 50px rgba(0,0,0,.3); }
+        .masthead h1 span { color: #f7ccac; }
+        .masthead p { max-width: 350px; color: #b9bad1; font-size: 14px; line-height: 1.8; }
+        #ui-layer { top: auto; left: auto; right: clamp(20px, 4vw, 62px); bottom: clamp(22px, 6vh, 70px); width: min(290px, calc(100vw - 40px)); box-sizing: border-box; padding: 22px; border: 1px solid rgba(255,255,255,.18); border-radius: 22px; background: rgba(20, 25, 49, .78); box-shadow: 0 22px 70px rgba(0,0,0,.25); backdrop-filter: blur(18px); }
+        #ui-layer h2 { margin: 0 0 15px; font-size: 17px; font-weight: 600; }
+        #ui-layer button { width: 100%; min-height: 42px; border: 0; border-radius: 12px; cursor: pointer; font: inherit; font-size: 13px; font-weight: 700; }
+        #demo-btn { margin-bottom: 8px; color: #242038; background: #f5d0b3; }
+        #start-btn { padding: 8px 12px; border: 1px solid rgba(255,255,255,.2) !important; color: #f1eefa; background: rgba(255,255,255,.08); }
+        #start-btn:disabled { color: #b9bad1; background: rgba(255,255,255,.04); }
+        #ui-layer label { color: #bdc3d9; }
+        #ui-layer input[type=range] { accent-color: #f2a994; }
+        #status { color: #b9bad1; line-height: 1.5; }
+        .instruction { left: clamp(24px, 6vw, 90px); bottom: clamp(23px, 7vh, 82px); width: auto; max-width: 480px; color: #b9bad1; opacity: 1; text-align: left; text-shadow: none; font-family: inherit; font-size: 12px; font-weight: 500; letter-spacing: .12em; }
+        @media (max-width: 720px) { .masthead { top: 24px; } .masthead h1 { margin-top: 10px; font-size: 46px; } .masthead p { font-size: 12px; } #ui-layer { right: 14px; bottom: 14px; padding: 15px; } .instruction { left: 22px; bottom: 260px; font-size: 11px; } }
+        @media (prefers-reduced-motion: reduce) { * { transition-duration: 0s !important; } }
+    </style>
+</head>
+<body>
+    <div class="masthead"><div class="eyebrow">INTERACTIVE / 01</div><h1>把声音<br><span>变成烟花。</span></h1><p>点一下夜空，就有一束光。也可以打开麦克风，让掌声把烟花点亮。</p></div>
+    <div id="ui-layer">
+        <h2>烟花控制台</h2>
+        <div class="control-group"><button id="demo-btn" type="button">点击试玩一束烟花 ↗</button></div>
+        <div class="control-group">
+            <button id="start-btn" type="button">开启麦克风声控</button>
+        </div>
+        <div class="control-group">
+            <label for="sensitivity">声音触发灵敏度</label>
+            <input type="range" id="sensitivity" min="10" max="100" value="40">
+        </div>
+        <div class="control-group">
+            <label>当前音量: <span id="vol-level">0</span></label>
+            <div style="width: 100%; height: 5px; background: #333; border-radius: 2px; overflow: hidden;">
+                <div id="vol-bar" style="width: 0%; height: 100%; background: #00ff88; transition: width 0.1s;"></div>
+            </div>
+        </div>
+        <div id="status" role="status">无需麦克风也能点击试玩</div>
+    </div>
+
+    <div class="instruction">CLICK ANYWHERE TO LIGHT UP THE NIGHT</div>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        // === 1. Setup Canvas ===
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // === 2. Particle System ===
+        const particles = [];
+        const gravity = 0.035;
+        const friction = 0.982;
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const stars = Array.from({ length: 110 }, (_, i) => ({ x: ((i * 73.13) % 100) / 100, y: ((i * 37.73) % 100) / 100, size: i % 7 === 0 ? 1.6 : .75 }));
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                // Explosion logic: random angle and speed
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 6 + 3;
+                
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                
+                this.alpha = 1;
+                this.decay = Math.random() * 0.007 + 0.003;
+                this.color = color;
+                this.size = Math.random() * 2.3 + 1.2;
+            }
+
+            update() {
+                this.vx *= friction;
+                this.vy *= friction;
+                this.vy += gravity; // Add gravity
+                this.x += this.vx;
+                this.y += this.vy;
+                this.alpha -= this.decay;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function createFirework(x, y) {
+            // Random vibrant color
+            const hues = [18, 39, 183, 265, 330];
+            const hue = hues[Math.floor(Math.random() * hues.length)];
+            const color = `hsl(${hue}, 100%, 72%)`;
+            const particleCount = 130;
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        // === 3. Audio Analysis ===
+        let audioContext;
+        let analyser;
+        let dataArray;
+        let isListening = false;
+        
+        // Cooldown system to prevent too many fireworks at once
+        let lastTriggerTime = 0;
+        const cooldown = 300; // ms
+
+        const startBtn = document.getElementById('start-btn');
+        const demoBtn = document.getElementById('demo-btn');
+        const statusDiv = document.getElementById('status');
+        const sensitivityInput = document.getElementById('sensitivity');
+        const volLevelSpan = document.getElementById('vol-level');
+        const volBar = document.getElementById('vol-bar');
+
+        async function initAudio() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 256; // Smaller size for faster processing
+                
+                const source = audioContext.createMediaStreamSource(stream);
+                source.connect(analyser);
+                
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+                
+                isListening = true;
+                startBtn.disabled = true;
+                startBtn.textContent = "正在监听麦克风...";
+                statusDiv.textContent = "状态: 运行中 (请拍手)";
+                
+            } catch (err) {
+                console.error(err);
+                statusDiv.textContent = "麦克风未开启，仍可点击夜空试玩。";
+                statusDiv.style.color = "#f3c8b7";
+            }
+        }
+
+        demoBtn.addEventListener('click', () => createFirework(width * .66, height * .38));
+        canvas.addEventListener('click', event => createFirework(event.clientX, event.clientY));
+        startBtn.addEventListener('click', () => {
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            if (!isListening) {
+                initAudio();
+            }
+        });
+
+        // === 4. Main Loop ===
+        function animate(timestamp) {
+            requestAnimationFrame(animate);
+            if (document.hidden) return;
+
+            // 4.1 Visual Effect: Trail
+            // Instead of clearing the canvas completely, fill with semi-transparent black
+            // This creates the trail effect seen in the video
+            ctx.fillStyle = 'rgba(8, 11, 28, 0.16)'; 
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.fillStyle = 'rgba(241, 224, 255, .78)';
+            stars.forEach(star => { ctx.globalAlpha = .35 + star.size * .2; ctx.beginPath(); ctx.arc(star.x * width, star.y * height, star.size, 0, Math.PI * 2); ctx.fill(); });
+            ctx.globalAlpha = 1;
+
+            // 4.2 Update & Draw Particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.update();
+                p.draw();
+                if (p.alpha <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+
+            // 4.3 Audio Trigger Logic
+            if (isListening) {
+                analyser.getByteFrequencyData(dataArray);
+
+                // Calculate average volume
+                let sum = 0;
+                for (let i = 0; i < dataArray.length; i++) {
+                    sum += dataArray[i];
+                }
+                const average = sum / dataArray.length;
+
+                // Visual Feedback for volume
+                volLevelSpan.textContent = Math.floor(average);
+                volBar.style.width = Math.min(100, average * 2) + '%';
+
+                // Trigger Logic
+                // Sensitivity input range is 10-100. Lower input = easier to trigger (lower threshold)
+                // We map the slider (10-100) to a threshold (say, 10 to 100 volume level)
+                // Inverting logic: Slider High = Sensitive = Low Threshold
+                // Let's keep it simple: Slider is the Threshold directly.
+                const threshold = parseInt(sensitivityInput.value); 
+
+                // Check if volume exceeds threshold AND cooldown is over
+                if (average > threshold && (Date.now() - lastTriggerTime > cooldown)) {
+                    // Trigger Firework!
+                    
+                    // Random position mostly in the upper/center part of screen
+                    const randX = Math.random() * (width * 0.8) + (width * 0.1);
+                    const randY = Math.random() * (height * 0.6) + (height * 0.1);
+                    
+                    createFirework(randX, randY);
+                    
+                    lastTriggerTime = Date.now();
+                    
+                    // Visual "Bump" on the text
+                    const instruction = document.querySelector('.instruction');
+                    instruction.style.transform = "scale(1.2)";
+                    instruction.style.color = "#ffff00";
+                    setTimeout(() => {
+                        instruction.style.transform = "scale(1)";
+                        instruction.style.color = "white";
+                    }, 100);
+                }
+            }
+        }
+
+        createFirework(width * .68, height * .38);
+        createFirework(width * .48, height * .53);
+        if (!reducedMotion) window.setInterval(() => createFirework(width * (.45 + Math.random() * .4), height * (.24 + Math.random() * .32)), 3700);
+        animate(); 
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFC Wallet - Light Glassmorphism</title>
+    <!-- 引入 Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- 使用 Inter 字体 -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            /* 柔和的浅灰色背景，模仿原图 */
+            background-color: #F8F9FA; 
+            color: #333333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        /* 抽象的背景光晕/Blob 样式 */
+        .abstract-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px); 
+            opacity: 0.8;
+            pointer-events: none;
+            z-index: 0;
+            transform: rotate(-15deg);
+        }
+
+        .blob-pink { top: 15%; left: 10%; width: 250px; height: 250px; background-color: #FBCFE8; } /* 浅粉色光晕 */
+        .blob-purple { bottom: 20%; right: 15%; width: 300px; height: 300px; background-color: #DDD6FE; } /* 浅紫色光晕 */
+
+        /* 玻璃拟态卡片容器 (模仿图片右侧的 Add Card 界面) */
+        .glass-container {
+            position: relative;
+            background: rgba(255, 255, 255, 0.7); /* 半透明白色背景 */
+            backdrop-filter: blur(20px); /* 模糊效果 */
+            border-radius: 3rem; /* 超大圆角 */
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            max-width: 400px; /* 模拟手机屏幕宽度 */
+            width: 100%;
+            min-height: 700px;
+            overflow: hidden;
+            z-index: 10;
+        }
+        
+        /* NFC 卡片样式 (浅色/柔和渐变) */
+        .nfc-card {
+            background: linear-gradient(135deg, #E6E0FF 0%, #E0F2FE 40%, #FFF3F8 100%);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 8px 32px 0 rgba(100, 100, 100, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            height: 220px;
+            color: #333;
+            transition: all 0.3s ease; /* 添加动画 */
+        }
+        
+        /* 卡片悬停 3D 效果 */
+        .nfc-card:hover {
+             transform: perspective(1000px) rotateX(1deg) translateY(-4px);
+             box-shadow: 0 12px 36px 0 rgba(167, 139, 250, 0.3); /* 柔和的紫色阴影 */
+        }
+
+        /* 卡片内部的抽象渐变 */
+        .nfc-card::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: -50px;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(167, 139, 250, 0.6); /* 柔和紫色 */
+            filter: blur(60px);
+        }
+
+        .nfc-card::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            right: -30px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(251, 191, 36, 0.6); /* 柔和黄色 */
+            filter: blur(40px);
+        }
+
+        /* 顶部导航图标样式 */
+        .nav-icon {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 9999px;
+            padding: 0.5rem;
+            transition: background 0.3s;
+        }
+        .nav-icon:hover {
+            background: rgba(255, 255, 255, 0.9);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 抽象背景光晕 -->
+    <div class="abstract-blob blob-pink"></div>
+    <div class="abstract-blob blob-purple"></div>
+
+    <!-- 玻璃拟态主容器 (模拟手机界面) -->
+    <div class="glass-container p-6 flex flex-col">
+        
+        <!-- 顶部导航栏 -->
+        <header class="flex justify-between items-center mb-6 pt-4">
+            <!-- 返回按钮 -->
+            <div class="nav-icon">
+                <i class="fas fa-arrow-left w-5 h-5 text-gray-600"></i>
+            </div>
+            <h1 class="text-xl font-semibold text-gray-800">添加 NFC 卡</h1>
+            <!-- 加号按钮 -->
+            <div class="nav-icon">
+                <i class="fas fa-plus w-5 h-5 text-gray-600"></i>
+            </div>
+        </header>
+
+        <!-- 卡片切换区域 (新增内容元素) -->
+        <div class="text-center mb-6">
+            <h2 class="text-3xl font-bold text-gray-800">交通卡</h2>
+            <div class="flex justify-center space-x-2 mt-2">
+                <!-- 切换指示点 -->
+                <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+                <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+            </div>
+        </div>
+
+
+        <!-- 柔和渐变的 NFC 卡片预览 -->
+        <div class="nfc-card p-6 mb-8">
+            <!-- NFC 标志 -->
+            <div class="text-gray-700 text-3xl mb-4 absolute top-6 right-6 z-20">
+                <i class="fas fa-wifi transform rotate-90"></i>
+            </div>
+            
+            <p class="text-xs font-bold uppercase text-gray-600 tracking-wider z-20 relative">City Transport</p>
+            <p class="text-3xl font-extrabold text-gray-800 tracking-widest mt-1 z-20 relative">PASS</p>
+            
+            <div class="absolute bottom-6 left-6 z-20">
+                <p class="text-sm font-medium text-gray-700">余额: ¥ 128.50</p>
+            </div>
+
+            <div class="absolute bottom-6 right-6 z-20">
+                <p class="text-sm font-medium text-gray-700">ID: **** 6886</p>
+            </div>
+        </div>
+
+        <!-- 卡片设置和详情列表 (新增内容元素) -->
+        <div class="flex-grow flex flex-col justify-between">
+            <div class="space-y-4">
+                <h2 class="text-lg font-semibold text-gray-700">卡片设置</h2>
+                
+                <!-- 列表项 1: 权限 -->
+                <div class="flex justify-between items-center p-3 rounded-xl bg-white/60 transition hover:bg-white/90 cursor-pointer">
+                    <div class="flex items-center space-x-4">
+                        <i class="fas fa-lock w-5 h-5 text-purple-500"></i>
+                        <span class="font-medium text-gray-800">读取权限</span>
+                    </div>
+                    <span class="text-sm text-gray-500">仅限设备</span>
+                </div>
+
+                <!-- 列表项 2: 自动充值 -->
+                <div class="flex justify-between items-center p-3 rounded-xl bg-white/60 transition hover:bg-white/90 cursor-pointer">
+                    <div class="flex items-center space-x-4">
+                        <i class="fas fa-redo w-5 h-5 text-yellow-500"></i>
+                        <span class="font-medium text-gray-800">自动充值</span>
+                    </div>
+                    <!-- 模仿开关按钮 -->
+                    <div class="w-10 h-6 bg-green-500 rounded-full p-1 transition-colors">
+                        <div class="w-4 h-4 bg-white rounded-full shadow-md transform translate-x-4 transition-transform"></div>
+                    </div>
+                </div>
+
+                <!-- 列表项 3: 绑定账户 -->
+                <div class="flex justify-between items-center p-3 rounded-xl bg-white/60 transition hover:bg-white/90 cursor-pointer">
+                    <div class="flex items-center space-x-4">
+                        <i class="fas fa-university w-5 h-5 text-pink-500"></i>
+                        <span class="font-medium text-gray-800">绑定银行</span>
+                    </div>
+                    <span class="text-sm text-gray-500">已绑定</span>
+                </div>
+            </div>
+            
+            <!-- 激活按钮和指纹图标 (保持底部样式) -->
+            <div class="flex justify-end items-center mt-8">
+                <!-- 指纹/生物识别图标 -->
+                <div class="nav-icon mr-3">
+                    <i class="fas fa-fingerprint w-5 h-5 text-gray-600"></i>
+                </div>
+                <!-- 激活按钮 -->
+                <button class="w-16 h-16 rounded-full bg-black flex items-center justify-center shadow-xl hover:bg-gray-800 transition">
+                    <i class="fas fa-arrow-right w-6 h-6 text-white"></i>
+                </button>
+            </div>
+        </div>
+        
+    </div>
+</body>
+</html>

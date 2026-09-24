@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宝格丽胶片风格照相机</title>
+    <!-- 引入 Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 全局样式：奶油色背景，复古字体 */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FAF7F0; /* 奶油色背景 */
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+        }
+
+        /* 标题和信息 */
+        .header-text {
+            color: #5D5C61; /* 深灰色文本 */
+        }
+        
+        /* 布局容器 */
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            max-width: 1400px;
+            width: 100%;
+            margin: auto;
+            flex-grow: 1;
+        }
+        @media (min-width: 768px) {
+            .main-container {
+                flex-direction: row;
+            }
+        }
+
+        /* 左侧相机界面样式 (模拟拍立得造型) */
+        #cameraInterface {
+            flex-shrink: 0;
+            width: 100%;
+            max-width: 450px; /* 固定相机宽度 */
+            padding: 2rem;
+            background-color: #EFEBE4; /* 浅奶油色 */
+            border-radius: 40px;
+            box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.05), -5px -5px 15px #FFF;
+        }
+        .camera-lens {
+            width: 150px;
+            height: 150px;
+            background-color: #A3A3A3; /* 模拟镜头颜色 */
+            border-radius: 50%;
+            border: 10px solid #FFF;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 215, 0, 0.8);
+            position: relative;
+        }
+        
+        /* 视频预览 */
+        #video {
+            display: none;
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            filter: grayscale(0.1) sepia(0.1) contrast(1.1); /* 轻微的实时胶片感 */
+        }
+        
+        /* 右侧照片画布样式 */
+        #photoCanvas {
+            flex-grow: 1;
+            width: 100%;
+            min-height: 500px; /* 最小高度 */
+            background-color: #F8F5EE; /* 略深一点的画布色 */
+            border-radius: 20px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative; /* 必须为 relative，以便照片绝对定位 */
+            overflow: hidden;
+            border: 1px solid #E0E0E0;
+        }
+        #canvas { display: none; } /* 隐藏拍照用的 Canvas */
+
+        /* 胶片照片样式 */
+        .polaroid-photo {
+            position: absolute;
+            background-color: white;
+            padding: 10px 10px 35px 10px; /* 底部留白多一点 */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            cursor: grab;
+            user-select: none;
+            transition: box-shadow 0.2s, transform 0.2s;
+            max-width: 250px; /* 限制照片大小 */
+        }
+        .polaroid-photo:active {
+            cursor: grabbing;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            z-index: 100; /* 拖动时置顶 */
+        }
+        .polaroid-photo img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        
+        /* 胶片底部文字区域 */
+        .polaroid-caption {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            font-size: 10px;
+            text-align: center;
+            color: #4A4A4A;
+            font-family: monospace; /* 模拟手写/打印体 */
+        }
+        
+        /* 按钮样式 */
+        .capture-button {
+            /* 柔和的红色按钮，与主题搭配 */
+            background-color: #E99C9C;
+            color: #FFF;
+            box-shadow: 0 4px 10px rgba(233, 156, 156, 0.5);
+            transition: all 0.2s ease;
+        }
+        .capture-button:hover {
+            background-color: #D68787;
+            transform: translateY(-1px);
+        }
+
+    </style>
+</head>
+<body>
+
+    <header class="text-center mb-10">
+        <h1 class="text-3xl md:text-4xl font-extrabold tracking-widest header-text">
+            宝格丽胶片体验 (Film & Polaroid)
+        </h1>
+        <p class="mt-2 text-md text-gray-500">捕捉、滤镜，并自由排版您的宝格丽瞬间。</p>
+    </header>
+
+    <div class="main-container">
+        <!-- 左侧：相机界面 (Camera Interface) -->
+        <div id="cameraInterface" class="flex flex-col items-center">
+            
+            <div class="camera-lens flex items-center justify-center mb-8">
+                <!-- 视频预览框，放置在镜头中央 -->
+                <div class="w-2/3 h-2/3 rounded-full overflow-hidden absolute">
+                    <video id="video" class="camera-feed" autoplay></video>
+                    <div id="loadingIndicator" class="loading-ring absolute inset-0 m-auto" style="display:none;"></div>
+                </div>
+            </div>
+
+            <p id="statusMessage" class="text-gray-500 text-center p-2 hidden">摄像头尚未启用。</p>
+            
+            <canvas id="canvas"></canvas>
+
+            <button id="captureButton" class="capture-button font-bold py-3 px-8 rounded-full focus:outline-none focus:ring-4 focus:ring-red-300 disabled:opacity-50 transition duration-300 w-full mt-6 text-lg">
+                启用摄像头
+            </button>
+            <p class="text-sm text-gray-500 mt-2 text-center">拍摄的照片将自动应用胶片风格滤镜并出现在右侧画布上。</p>
+        </div>
+
+        <!-- 右侧：照片画布 (Photo Canvas) -->
+        <div id="photoCanvas">
+            <p id="canvasPlaceholder" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-gray-400 text-xl pointer-events-none">
+                点击 “📸 拍立得” 按钮，照片将出现在这里！
+            </p>
+        </div>
+    </div>
+    
+    <!-- 自定义模态框 (代替 alert) -->
+    <div id="customModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 transition-opacity duration-300 opacity-0 hidden">
+        <div class="bg-white rounded-xl p-6 max-w-sm mx-4 shadow-2xl transform scale-95 transition-transform duration-300">
+            <h3 id="modalTitle" class="text-xl font-bold mb-3 text-red-600"></h3>
+            <p id="modalMessage" class="text-gray-700 mb-6"></p>
+            <button id="modalCloseButton" class="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg font-semibold">
+                确定
+            </button>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const captureButton = document.getElementById('captureButton');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const statusMessage = document.getElementById('statusMessage');
+            const photoCanvas = document.getElementById('photoCanvas');
+            const canvasPlaceholder = document.getElementById('canvasPlaceholder');
+
+            let stream = null;
+            let photoCounter = 0;
+            let cameraReady = false;
+
+            // --- 胶片风格滤镜核心逻辑 (Vintage Film Tone) ---
+            function applyVintageFilmFilter(ctx, width, height) {
+                const imageData = ctx.getImageData(0, 0, width, height);
+                const data = imageData.data;
+                const CONTRAST_FACTOR = 1.1; // 轻微对比度
+                const SATURATION_FACTOR = 0.9; // 略微去饱和
+                const WARM_SHIFT_R = 10; 
+                const WARM_SHIFT_G = 5;
+                const WARM_SHIFT_B = -10; // 降低蓝色，增加暖色
+
+                for (let i = 0; i < data.length; i += 4) {
+                    let r = data[i];
+                    let g = data[i + 1];
+                    let b = data[i + 2];
+                    
+                    // 1. 颜色转为灰度
+                    const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+
+                    // 2. 饱和度调整
+                    r = gray + (r - gray) * SATURATION_FACTOR;
+                    g = gray + (g - gray) * SATURATION_FACTOR;
+                    b = gray + (b - gray) * SATURATION_FACTOR;
+
+                    // 3. 对比度增强 (以 128 为中心)
+                    r = (r - 128) * CONTRAST_FACTOR + 128;
+                    g = (g - 128) * CONTRAST_FACTOR + 128;
+                    b = (b - 128) * CONTRAST_FACTOR + 128;
+
+                    // 4. 暖色调偏移
+                    r += WARM_SHIFT_R;
+                    g += WARM_SHIFT_G;
+                    b += WARM_SHIFT_B;
+                    
+                    // 5. 颜色值钳制
+                    data[i] = Math.max(0, Math.min(255, r));
+                    data[i + 1] = Math.max(0, Math.min(255, g));
+                    data[i + 2] = Math.max(0, Math.min(255, b));
+                }
+
+                ctx.putImageData(imageData, 0, 0);
+            }
+            // --- 滤镜逻辑结束 ---
+
+
+            // 1. 启动摄像头
+            async function startCamera() {
+                if (cameraReady) return true;
+                loadingIndicator.style.display = 'block';
+                statusMessage.style.display = 'block';
+                statusMessage.textContent = '正在请求摄像头权限...';
+                captureButton.disabled = true;
+                captureButton.textContent = '正在连接...';
+
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({
+                        video: {
+                            facingMode: 'user', // 前置摄像头
+                            width: { ideal: 640 },
+                            height: { ideal: 480 }
+                        }
+                    });
+                    
+                    video.srcObject = stream;
+                    video.style.display = 'block';
+
+                    video.onloadedmetadata = () => {
+                        video.play();
+                        loadingIndicator.style.display = 'none';
+                        statusMessage.style.display = 'none';
+                        cameraReady = true;
+                        captureButton.disabled = false;
+                        captureButton.textContent = '📸 拍立得 (Film Tone)';
+                        console.log("摄像头启动成功");
+                    };
+
+                    return true;
+
+                } catch (error) {
+                    console.error("启动摄像头失败:", error);
+                    loadingIndicator.style.display = 'none';
+                    statusMessage.textContent = '摄像头尚未启用，点击按钮可重试。';
+                    statusMessage.style.display = 'block';
+                    cameraReady = false;
+                    captureButton.disabled = false;
+                    captureButton.textContent = '重新启用摄像头';
+                    return false;
+                }
+            }
+            
+            // 2. 实现照片拖动功能
+            function makeDraggable(element) {
+                let isDragging = false;
+                let offsetX, offsetY;
+                
+                // 鼠标按下事件：开始拖动
+                element.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    // 计算鼠标位置与元素左上角的偏移量
+                    offsetX = e.clientX - element.getBoundingClientRect().left;
+                    offsetY = e.clientY - element.getBoundingClientRect().top;
+                    
+                    // 确保拖动时照片在最顶层
+                    element.style.zIndex = 1000;
+                    element.classList.add('active');
+                });
+                
+                // 鼠标移动事件：更新位置
+                document.addEventListener('mousemove', (e) => {
+                    if (!isDragging) return;
+                    e.preventDefault(); // 阻止默认行为，如文本选择
+                    
+                    const parentRect = photoCanvas.getBoundingClientRect();
+                    const elWidth = element.offsetWidth;
+                    const elHeight = element.offsetHeight;
+                    
+                    // 计算新的位置
+                    let newX = e.clientX - parentRect.left - offsetX;
+                    let newY = e.clientY - parentRect.top - offsetY;
+
+                    // 边界检查 (防止拖出画布)
+                    newX = Math.max(0, Math.min(newX, parentRect.width - elWidth));
+                    newY = Math.max(0, Math.min(newY, parentRect.height - elHeight));
+
+                    element.style.left = `${newX}px`;
+                    element.style.top = `${newY}px`;
+                });
+                
+                // 鼠标松开事件：结束拖动
+                document.addEventListener('mouseup', () => {
+                    if (isDragging) {
+                        isDragging = false;
+                        element.style.zIndex = photoCounter; // 恢复层级
+                        element.classList.remove('active');
+                    }
+                });
+            }
+
+            // 3. 拍照并创建新的可拖动照片
+            captureButton.addEventListener('click', async () => {
+                if (!cameraReady) {
+                    await startCamera();
+                    return;
+                }
+                if (video.readyState !== video.HAVE_ENOUGH_DATA || video.paused) {
+                    showModal('错误', '视频流尚未准备好或已暂停，请稍候再试。', 'bg-red-500');
+                    return;
+                }
+                
+                // 确保 Canvas 尺寸与视频帧一致
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+
+                const ctx = canvas.getContext('2d');
+                
+                // 1. 将视频当前帧绘制到 Canvas
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // 2. 应用胶片滤镜
+                applyVintageFilmFilter(ctx, canvas.width, canvas.height);
+                
+                // 3. 将 Canvas 内容转换为图片 URL
+                const dataURL = canvas.toDataURL('image/png');
+                
+                // 4. 创建新的照片元素 (Polaroid Style)
+                photoCounter++;
+                canvasPlaceholder.style.display = 'none';
+
+                const newPhoto = document.createElement('div');
+                newPhoto.className = 'polaroid-photo';
+                newPhoto.id = `photo-${photoCounter}`;
+                
+                // 随机旋转角度 (-5度到 5度)
+                const randomRotation = Math.random() * 10 - 5;
+                newPhoto.style.transform = `rotate(${randomRotation}deg)`;
+                
+                // 随机初始位置
+                const initialLeft = Math.floor(Math.random() * 50) + 10; // 10% to 60%
+                const initialTop = Math.floor(Math.random() * 40) + 10; // 10% to 50%
+                newPhoto.style.left = `${initialLeft}%`;
+                newPhoto.style.top = `${initialTop}%`;
+                newPhoto.style.zIndex = photoCounter; // 设置层级
+
+                newPhoto.innerHTML = `
+                    <img src="${dataURL}" alt="拍立得照片 ${photoCounter}">
+                    <div class="polaroid-caption"> BVLGARI FILM - ${new Date().toLocaleTimeString('zh-CN')} </div>
+                `;
+                
+                photoCanvas.appendChild(newPhoto);
+
+                // 使新照片可拖动
+                makeDraggable(newPhoto);
+                
+                console.log(`已捕获照片 ${photoCounter}`);
+            });
+
+            // 4. 模态框函数 (代替 alert)
+            function showModal(title, message, colorClass) {
+                let modal = document.getElementById('customModal');
+                const modalTitle = document.getElementById('modalTitle');
+                const modalMessage = document.getElementById('modalMessage');
+                const closeButton = document.getElementById('modalCloseButton');
+                
+                modalTitle.textContent = title;
+                modalMessage.textContent = message;
+                closeButton.className = `w-full ${colorClass} hover:${colorClass.replace('-500', '-600')} text-white py-2 rounded-lg font-semibold`;
+                
+                document.getElementById('modalCloseButton').onclick = () => {
+                    modal.classList.add('opacity-0');
+                    modal.querySelector('div').classList.remove('scale-100');
+                    setTimeout(() => modal.style.display = 'none', 300);
+                };
+
+                modal.style.display = 'flex';
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    modal.querySelector('div').classList.add('scale-100');
+                }, 10);
+            }
+
+        });
+    </script>
+</body>
+</html>

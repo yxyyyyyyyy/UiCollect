@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dark Finance App UI</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            bg: '#000000', // Pitch black as per image
+                            card: '#1c1c1e',
+                            surface: '#2c2c2e',
+                            input: '#1c1c1e'
+                        },
+                        primary: {
+                            blue: '#3b82f6',
+                            purple: '#7e22ce', // Darker purple
+                            accent: '#8b5cf6'
+                        },
+                        neon: {
+                            green: '#4ade80',
+                            purple: '#d8b4fe'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'neon-purple': '0 0 20px rgba(168, 85, 247, 0.4)',
+                        'neon-blue': '0 0 20px rgba(59, 130, 246, 0.4)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111;
+            color: white;
+            overflow: hidden;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(28, 28, 30, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Card Gradient */
+        .card-gradient {
+            background: linear-gradient(120deg, #6366f1 0%, #a855f7 50%, #d8b4fe 100%);
+        }
+
+        /* Smooth Screen Transitions */
+        .screen {
+            transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            background-color: #000000;
+        }
+        .screen.hidden-right { transform: translateX(100%); opacity: 0; pointer-events: none; }
+        .screen.hidden-left { transform: translateX(-20%); opacity: 0; pointer-events: none; } /* Parallax feel */
+        .screen.active { transform: translateX(0); opacity: 1; pointer-events: auto; z-index: 10; }
+
+        /* Custom Animations */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        
+        /* Chart specific highlight */
+        .chart-highlight-bar {
+            background: linear-gradient(to bottom, rgba(168, 85, 247, 0.3) 0%, rgba(168, 85, 247, 0) 100%);
+            border-top: 2px solid #a855f7;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+    </style>
+</head>
+<body class="flex justify-center items-center h-screen bg-neutral-900">
+
+    <!-- Mobile Frame -->
+    <div class="relative w-full h-full max-w-[400px] max-h-[850px] bg-dark-bg overflow-hidden shadow-2xl sm:rounded-[40px] border-gray-800 sm:border-[8px]">
+        
+        <!-- Status Bar -->
+        <div class="absolute top-0 w-full px-6 py-3 flex justify-between items-center z-50 text-xs text-white/90 pointer-events-none font-medium">
+            <span>9:41</span>
+            <div class="flex gap-1.5 items-center">
+                <i class="fas fa-signal text-[10px]"></i>
+                <i class="fas fa-wifi text-[10px]"></i>
+                <i class="fas fa-battery-full text-[10px]"></i>
+            </div>
+        </div>
+
+        <!-- ================= SCREEN 1: ONBOARDING ================= -->
+        <div id="screen-onboarding" class="screen active flex flex-col relative bg-black">
+            
+            <!-- SVG Abstract Ribbon (Recreating the image flow) -->
+            <div class="absolute inset-0 pointer-events-none overflow-hidden">
+                <!-- Background ambient glows -->
+                <div class="absolute top-0 left-0 w-full h-[60%] bg-blue-900/20 blur-[100px] rounded-full transform -translate-y-1/2"></div>
+                <div class="absolute bottom-0 right-0 w-[80%] h-[50%] bg-purple-900/20 blur-[100px] rounded-full transform translate-y-1/4"></div>
+
+                <!-- The Ribbon Shape -->
+                <svg viewBox="0 0 400 800" class="w-full h-full absolute top-0 left-0 animate-float">
+                    <defs>
+                        <linearGradient id="ribbonGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#2563eb" /> <!-- Blue -->
+                            <stop offset="50%" stop-color="#7c3aed" /> <!-- Violet -->
+                            <stop offset="100%" stop-color="#c084fc" /> <!-- Light Purple -->
+                        </linearGradient>
+                        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                            <feGaussianBlur stdDeviation="15" result="blur" />
+                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                        </filter>
+                    </defs>
+                    <!-- Main Ribbon Path -->
+                    <path d="M-50,100 C150,50 250,300 150,450 C50,600 300,550 450,400" 
+                          stroke="url(#ribbonGradient)" 
+                          stroke-width="80" 
+                          fill="none" 
+                          stroke-linecap="round"
+                          filter="url(#glow)"
+                          opacity="0.9" />
+                    <!-- Secondary intersecting path for depth -->
+                    <path d="M450,200 C350,300 50,250 150,450" 
+                          stroke="url(#ribbonGradient)" 
+                          stroke-width="60" 
+                          fill="none" 
+                          stroke-linecap="round"
+                          opacity="0.6"
+                          filter="url(#glow)"
+                          style="mix-blend-mode: screen;" />
+                </svg>
+            </div>
+
+            <!-- Content Area -->
+            <div class="flex-1"></div> <!-- Spacer -->
+            <div class="p-8 pb-12 z-10 relative">
+                <h1 class="text-[42px] font-bold leading-[1.1] mb-10 tracking-wide text-white">
+                    The best way <br/>
+                    to manage your <br/>
+                    money
+                </h1>
+
+                <div class="flex justify-between items-center">
+                    <!-- Pagination Dots -->
+                    <div class="flex gap-2">
+                        <div class="w-8 h-2 bg-white rounded-full transition-all duration-300"></div>
+                        <div class="w-2 h-2 bg-gray-700 rounded-full"></div>
+                        <div class="w-2 h-2 bg-gray-700 rounded-full"></div>
+                    </div>
+
+                    <!-- Next Button with Glow -->
+                    <button onclick="navigateTo('home')" class="w-16 h-16 rounded-full card-gradient flex items-center justify-center shadow-neon-purple active:scale-90 transition-all duration-300 group">
+                        <i class="fas fa-chevron-right text-xl group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SCREEN 2: HOME ================= -->
+        <div id="screen-home" class="screen hidden-right flex flex-col pb-24 bg-black">
+            <!-- Header -->
+            <div class="px-6 pt-14 pb-8 flex justify-between items-center">
+                <div class="flex flex-col">
+                    <span class="text-gray-400 text-sm font-medium mb-1">Total Balance</span>
+                    <h2 class="text-3xl font-bold tracking-tight">$ 10,456.00</h2>
+                </div>
+                <div class="w-10 h-10 rounded-full border border-gray-700 p-0.5">
+                    <img src="https://i.pravatar.cc/150?img=5" alt="Profile" class="w-full h-full rounded-full object-cover grayscale opacity-80 hover:grayscale-0 transition-all">
+                </div>
+            </div>
+
+            <!-- Cards Scroll -->
+            <div class="w-full overflow-visible relative z-20 mb-8">
+                <div class="overflow-x-auto no-scrollbar pl-6 flex gap-5 snap-x snap-mandatory pr-6">
+                    <!-- Primary Card -->
+                    <div class="snap-center min-w-[320px] h-[200px] rounded-[32px] card-gradient p-7 flex flex-col justify-between relative overflow-hidden shadow-2xl shadow-purple-900/30">
+                        <!-- Card Decor -->
+                        <div class="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-[50px] -mr-16 -mt-16 pointer-events-none"></div>
+                        
+                        <div class="flex justify-between items-start z-10">
+                            <div>
+                                <p class="text-white/80 text-sm font-medium mb-1.5">Balance</p>
+                                <h3 class="text-[28px] font-bold tracking-tight">$ 6,275.50</h3>
+                            </div>
+                            <!-- Mastercard Circles -->
+                            <div class="flex opacity-90">
+                                <div class="w-8 h-8 rounded-full bg-red-500/80 -mr-3 mix-blend-screen"></div>
+                                <div class="w-8 h-8 rounded-full bg-yellow-500/80 mix-blend-screen"></div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-end z-10 text-white/90">
+                            <div class="text-lg font-mono tracking-widest opacity-80">•••• •••• •••• 5380</div>
+                            <div class="flex flex-col items-end">
+                                <span class="text-[10px] opacity-60 uppercase mb-0.5">Valid Thru</span>
+                                <span class="text-sm font-medium">07/25</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Second Card (Visual Cue) -->
+                    <div class="snap-center min-w-[60px] h-[200px] rounded-l-[32px] bg-gradient-to-b from-teal-400 to-emerald-600 opacity-30 blur-[1px]"></div>
+                </div>
+                
+                <!-- Card Pagination -->
+                <div class="flex justify-center gap-1.5 mt-6">
+                    <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+                    <div class="w-1.5 h-1.5 bg-gray-800 rounded-full"></div>
+                    <div class="w-1.5 h-1.5 bg-gray-800 rounded-full"></div>
+                </div>
+            </div>
+
+            <!-- Action Buttons (Matched Icons) -->
+            <div class="px-6 grid grid-cols-4 gap-4 mb-8">
+                <!-- Payment (Wallet) -->
+                <button class="flex flex-col items-center gap-2 group">
+                    <div class="w-16 h-16 rounded-[24px] bg-dark-surface flex items-center justify-center text-gray-300 group-active:scale-95 transition-all shadow-lg shadow-black/50 border border-white/5">
+                        <i class="fas fa-wallet text-xl"></i>
+                    </div>
+                    <span class="text-[11px] font-medium text-gray-400">Payment</span>
+                </button>
+                <!-- Send (Loop/Refresh style arrow as per image perception or standard send) -->
+                <button class="flex flex-col items-center gap-2 group">
+                    <div class="w-16 h-16 rounded-[24px] bg-dark-surface flex items-center justify-center text-gray-300 group-active:scale-95 transition-all shadow-lg shadow-black/50 border border-white/5">
+                         <!-- Using a specific arrow icon to match 'Send' concept but styled uniquely -->
+                        <i class="fas fa-paper-plane text-xl transform -rotate-12"></i>
+                    </div>
+                    <span class="text-[11px] font-medium text-gray-400">Send</span>
+                </button>
+                <!-- Receive (Arrow Down) -->
+                <button class="flex flex-col items-center gap-2 group">
+                    <div class="w-16 h-16 rounded-[24px] bg-dark-surface flex items-center justify-center text-gray-300 group-active:scale-95 transition-all shadow-lg shadow-black/50 border border-white/5">
+                        <i class="fas fa-arrow-down text-xl"></i>
+                    </div>
+                    <span class="text-[11px] font-medium text-gray-400">Receive</span>
+                </button>
+                <!-- More (Grid) -->
+                <button class="flex flex-col items-center gap-2 group">
+                    <div class="w-16 h-16 rounded-[24px] bg-dark-surface flex items-center justify-center text-gray-300 group-active:scale-95 transition-all shadow-lg shadow-black/50 border border-white/5">
+                        <i class="fas fa-th-large text-xl"></i>
+                    </div>
+                    <span class="text-[11px] font-medium text-gray-400">More</span>
+                </button>
+            </div>
+
+            <!-- Transactions List -->
+            <div class="flex-1 bg-black px-6">
+                <div class="flex justify-between items-center mb-6 cursor-pointer group" onclick="navigateTo('stats')">
+                    <h3 class="text-xl font-bold tracking-tight">Transactions</h3>
+                    <div class="flex items-center text-gray-500 text-xs font-medium gap-1 bg-dark-surface px-2 py-1 rounded-lg">
+                        Last week <i class="fas fa-chevron-down text-[10px]"></i>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-[#1db954]/20 flex items-center justify-center text-[#1db954]">
+                                <i class="fab fa-spotify text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-white text-base">Spotify</h4>
+                                <p class="text-xs text-gray-500 mt-0.5 font-medium">12 June - 12:34 AM</p>
+                            </div>
+                        </div>
+                        <span class="font-bold text-white tracking-wide">- $ 7,99</span>
+                    </div>
+
+                    <div class="flex items-center justify-between group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-[#7b68ee]/20 flex items-center justify-center text-[#7b68ee]">
+                                <i class="fas fa-cube text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-white text-base">ClickUp</h4>
+                                <p class="text-xs text-gray-500 mt-0.5 font-medium">11 June - 17:23 PM</p>
+                            </div>
+                        </div>
+                        <span class="font-bold text-white tracking-wide">- $ 19,00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SCREEN 3: STATISTICS ================= -->
+        <div id="screen-stats" class="screen hidden-right flex flex-col bg-black h-full">
+            <!-- Header -->
+            <div class="px-6 pt-14 pb-6 flex justify-between items-center bg-black z-20">
+                <button onclick="navigateTo('home')" class="w-10 h-10 rounded-full border border-gray-800 flex items-center justify-center text-gray-400 hover:bg-gray-900 active:scale-90 transition-all">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <h2 class="text-lg font-bold tracking-wide">Statistics</h2>
+                <button class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white transition">
+                    <i class="fas fa-ellipsis-h"></i>
+                </button>
+            </div>
+
+            <!-- Time Filter -->
+            <div class="px-6 mb-8">
+                <div class="bg-dark-surface rounded-xl p-1.5 flex shadow-inner shadow-black/50">
+                    <button class="flex-1 py-2 text-xs font-medium text-gray-500 hover:text-gray-300 transition">Day</button>
+                    <button class="flex-1 py-2 text-xs font-medium text-gray-500 hover:text-gray-300 transition">Month</button>
+                    <button class="flex-1 py-2 text-xs font-bold bg-dark-card text-white shadow-lg rounded-[10px] border border-white/5 transition transform scale-100">Year</button>
+                </div>
+            </div>
+
+            <!-- Income/Expense Summary -->
+            <div class="px-6 flex justify-between mb-4">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-2.5 h-2.5 rounded-full bg-neon-green shadow-[0_0_8px_rgba(74,222,128,0.6)]"></div>
+                    <div>
+                        <p class="text-sm font-bold text-white tracking-wide">$ 8,789.00</p>
+                        <p class="text-[10px] text-gray-500 font-medium uppercase tracking-wider">income</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <div class="w-2.5 h-2.5 rounded-full bg-gray-600"></div>
+                    <div>
+                        <p class="text-sm font-bold text-white tracking-wide">$ 3,203.00</p>
+                        <p class="text-[10px] text-gray-500 font-medium uppercase tracking-wider">expense</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Area -->
+            <div class="w-full h-[240px] relative mb-6 group">
+                <!-- Highlight Bar Background (The vertical column for Dec) -->
+                <!-- Positioned absolute: Left needs to align with Dec label approx 30-35% -->
+                <div class="absolute top-[40px] left-[35%] w-12 h-[160px] chart-highlight-bar z-0 opacity-80 pointer-events-none"></div>
+
+                <!-- Floating Tooltip -->
+                <div class="absolute top-[15%] left-[35%] transform -translate-x-1/2 -translate-y-full z-20 flex flex-col items-center transition-all duration-500 ease-out" id="stats-tooltip">
+                    <div class="bg-white text-black px-3 py-1.5 rounded-[10px] text-xs font-bold shadow-[0_4px_15px_rgba(255,255,255,0.3)]">
+                        $ 8,789.00
+                    </div>
+                    <!-- Triangle -->
+                    <div class="w-2 h-2 bg-white rotate-45 -mt-1 shadow-sm"></div>
+                    <!-- Dot on line -->
+                    <div class="w-3.5 h-3.5 bg-black rounded-full border-[3px] border-white mt-1 shadow-lg"></div>
+                </div>
+                
+                <canvas id="financeChart" class="w-full h-full relative z-10"></canvas>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="px-6 mb-6">
+                <div class="relative group">
+                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 group-focus-within:text-purple-400 transition"></i>
+                    <input type="text" placeholder="Search transactions" class="w-full bg-dark-surface border border-gray-800 rounded-2xl py-4 pl-12 pr-4 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500/50 focus:bg-dark-card transition-all shadow-inner">
+                </div>
+            </div>
+
+            <!-- Transactions List (Scrollable) -->
+            <div class="flex-1 px-6 overflow-y-auto no-scrollbar pb-10">
+                <div class="flex justify-between items-center mb-5">
+                    <h3 class="text-lg font-bold">Transactions</h3>
+                    <div class="flex items-center text-gray-500 text-xs font-medium gap-1 bg-dark-surface px-2 py-1 rounded-lg">
+                        Income <i class="fas fa-chevron-down text-[10px]"></i>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- Transaction Item -->
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full bg-gray-800 overflow-hidden border border-gray-700">
+                                <img src="https://i.pravatar.cc/150?img=11" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white text-sm">Mike W.</h4>
+                                <p class="text-[10px] text-gray-500 font-medium mt-0.5">31 Dec - 19:55 PM</p>
+                            </div>
+                        </div>
+                        <span class="font-bold text-green-400 tracking-wide text-sm">+ $ 150,00</span>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full bg-gray-800 overflow-hidden border border-gray-700">
+                                <img src="https://i.pravatar.cc/150?img=9" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white text-sm">Jane P.</h4>
+                                <p class="text-[10px] text-gray-500 font-medium mt-0.5">30 Dec - 17:23 PM</p>
+                            </div>
+                        </div>
+                        <span class="font-bold text-green-400 tracking-wide text-sm">+ $ 350,00</span>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full bg-gray-800 overflow-hidden border border-gray-700">
+                                <img src="https://i.pravatar.cc/150?img=33" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white text-sm">John D.</h4>
+                                <p class="text-[10px] text-gray-500 font-medium mt-0.5">28 Dec - 10:15 AM</p>
+                            </div>
+                        </div>
+                        <span class="font-bold text-green-400 tracking-wide text-sm">+ $ 1,200,00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= BOTTOM NAVIGATION ================= -->
+        <div id="bottom-nav" class="absolute bottom-0 w-full glass-panel border-t-0 rounded-t-[30px] pb-8 pt-5 px-8 flex justify-between items-center z-50 transform transition-transform duration-500 translate-y-full">
+            <button onclick="navigateTo('home')" class="nav-item flex flex-col items-center gap-1.5 text-purple-400 group">
+                <i class="fas fa-home text-xl group-hover:scale-110 transition-transform"></i>
+                <span class="text-[10px] font-medium">Main</span>
+            </button>
+            <button class="nav-item flex flex-col items-center gap-1.5 text-gray-600 hover:text-white transition group">
+                <i class="fas fa-exchange-alt text-xl group-hover:scale-110 transition-transform"></i>
+                <span class="text-[10px] font-medium">Transfers</span>
+            </button>
+            <div class="relative">
+                 <button class="nav-item flex flex-col items-center gap-1.5 text-gray-600 hover:text-white transition group">
+                    <i class="far fa-comment-dots text-xl group-hover:scale-110 transition-transform"></i>
+                    <span class="text-[10px] font-medium">Chat</span>
+                </button>
+                <div class="absolute top-0 right-1 w-2 h-2 bg-red-500 rounded-full"></div>
+            </div>
+           
+            <button class="nav-item flex flex-col items-center gap-1.5 text-gray-600 hover:text-white transition group">
+                <i class="fas fa-cog text-xl group-hover:scale-110 transition-transform"></i>
+                <span class="text-[10px] font-medium">Settings</span>
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Navigation Logic ---
+        const screens = {
+            onboarding: document.getElementById('screen-onboarding'),
+            home: document.getElementById('screen-home'),
+            stats: document.getElementById('screen-stats')
+        };
+        const bottomNav = document.getElementById('bottom-nav');
+        let currentScreen = 'onboarding';
+
+        function navigateTo(screenName) {
+            if (screenName === currentScreen) return;
+            
+            const incoming = screens[screenName];
+            const outgoing = screens[currentScreen];
+            
+            // Manage Bottom Nav
+            if (screenName === 'home') {
+                bottomNav.classList.remove('translate-y-full');
+            } else {
+                bottomNav.classList.add('translate-y-full');
+            }
+
+            // Direction Logic
+            let direction = 'right';
+            if (
+                (currentScreen === 'home' && screenName === 'onboarding') ||
+                (currentScreen === 'stats' && screenName === 'home')
+            ) {
+                direction = 'left';
+            }
+
+            // Reset classes
+            Object.values(screens).forEach(s => {
+                s.classList.remove('active', 'hidden-left', 'hidden-right');
+            });
+
+            // Apply Transitions
+            if (direction === 'right') {
+                outgoing.classList.add('hidden-left');
+                incoming.classList.remove('hidden-right'); // Ensure it starts from right if it was there
+                incoming.style.transform = ''; // Clear inline styles if any
+                incoming.classList.add('active');
+            } else {
+                outgoing.classList.add('hidden-right');
+                incoming.classList.remove('hidden-left');
+                incoming.classList.add('active');
+            }
+            
+            currentScreen = screenName;
+            
+            if (screenName === 'stats') {
+                // Small delay to let transition finish before chart renders perfectly
+                setTimeout(renderChart, 300);
+            }
+        }
+
+        // --- Chart Logic ---
+        let chartInstance = null;
+
+        function renderChart() {
+            const ctx = document.getElementById('financeChart').getContext('2d');
+            
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            // Gradient Fill
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(192, 132, 252, 0.4)'); // Light Purple
+            gradient.addColorStop(1, 'rgba(192, 132, 252, 0.0)');
+
+            // Gradient Stroke
+            const strokeGradient = ctx.createLinearGradient(0, 0, 400, 0);
+            strokeGradient.addColorStop(0, '#3b82f6'); // Blue
+            strokeGradient.addColorStop(0.5, '#a855f7'); // Purple
+            strokeGradient.addColorStop(1, '#d8b4fe'); // Light
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Balance',
+                        data: [6200, 5000, 8789, 6800, 7500, 7200, 8900, 8200, 9500],
+                        borderColor: strokeGradient,
+                        borderWidth: 3,
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.5, // High tension for smooth wave
+                        pointRadius: 0,
+                        pointHoverRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false } // Using custom HTML tooltip
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { 
+                                color: '#525252', 
+                                font: { family: 'Inter', size: 11 },
+                                maxRotation: 0,
+                                autoSkip: false 
+                            },
+                            border: { display: false }
+                        },
+                        y: {
+                            display: false,
+                            min: 3000
+                        }
+                    },
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeOutQuart'
+                    },
+                    layout: {
+                        padding: { left: 10, right: 10, bottom: 0 }
+                    }
+                }
+            });
+        }
+
+        // Initial setup
+        document.addEventListener('DOMContentLoaded', () => {
+             // Start rendering
+             renderChart();
+        });
+
+    </script>
+</body>
+</html>

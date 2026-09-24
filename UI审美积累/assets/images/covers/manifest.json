@@ -1,0 +1,478 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "id": "01",
+      "sourcePath": "pages/01-cover-annual-report.html",
+      "sourceSha256": "461ac4e0ff53e257ed34e3f8c844c812bead96eea8323fa76cc24c0f033eee73",
+      "coverPath": "assets/images/covers/01.png",
+      "coverSha256": "0840df27659737c9380d2148b9e5ade61295c3335379cb1c5d55041da415ba81",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "02",
+      "sourcePath": "pages/02-results-overview.html",
+      "sourceSha256": "a216f5a563dc830fec7b4b742439a1a85663c1f75d4dc0a2e4a595c3d9aaebc8",
+      "coverPath": "assets/images/covers/02.png",
+      "coverSha256": "5d648c86fb792ae9c744931f42f7a06279cc75ca8b289767c10f6b692d4e5fdc",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "03",
+      "sourcePath": "pages/03-corporate-governance.html",
+      "sourceSha256": "c2a4961fb953c62dc60267c44993d30c57753719e24ecdf614bbc27fe1d1ab55",
+      "coverPath": "assets/images/covers/03.png",
+      "coverSha256": "8179a88b5234b0ef35d65696e49add38b9d5434ef4c587282f4ee77324461067",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "04",
+      "sourcePath": "pages/04-strategy-field-to-shelf.html",
+      "sourceSha256": "1f3b87351441dbd07aa1a13b997cbe7784846c01967862b17b176b5be6d3e729",
+      "coverPath": "assets/images/covers/04.png",
+      "coverSha256": "e04449eb6d12298f5975d0bb209e77ea0ee29d80f3a09a8c2afadc04fbcd01e4",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "05",
+      "sourcePath": "pages/05-key-tech-projects.html",
+      "sourceSha256": "c8b30489ddf4e2a802b24c05a64545a9d352d5c5ed7d773cb3841be1fcaccea1",
+      "coverPath": "assets/images/covers/05.png",
+      "coverSha256": "394bc6874511015d6dd98da0aed008e5cc6b46eb21b251e8b096ca6f65608261",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "06",
+      "sourcePath": "pages/06-key-results-2025.html",
+      "sourceSha256": "c1d63f59c2a3729550329866c847df8f2f22282f7d544c6d16ebe2f2c567d2a2",
+      "coverPath": "assets/images/covers/06.png",
+      "coverSha256": "49a691eb0ba86e7ffe2e8295752e58eea719dabeba6f852aac5e2ca4ac399ea0",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "07",
+      "sourcePath": "pages/07-oil-business-intro.html",
+      "sourceSha256": "3d3d83f31087bc41dfc1ca7996d741757e7d10346b1783523d417c8c6b13286e",
+      "coverPath": "assets/images/covers/07.png",
+      "coverSha256": "b36fb8e7ecfd0172ba884901070b184cdaae2e014de146f8ac577a212f61ca7a",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "08",
+      "sourcePath": "pages/08-meat-business-intro.html",
+      "sourceSha256": "495354ec523f0b17889d55d65df51cc0c8512fc737cbfa06d1cc8b4f818a77a7",
+      "coverPath": "assets/images/covers/08.png",
+      "coverSha256": "b8f91a413cdc7f4bf802a6bb3fa17d422a25e9bae8b7d79c49d16333f041b261",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "09",
+      "sourcePath": "pages/09-sugar-business-intro.html",
+      "sourceSha256": "22d13dea4643102ae361752b6887f418479e5703c4ce77a87dc63f98c017f114",
+      "coverPath": "assets/images/covers/09.png",
+      "coverSha256": "20868d0d37cd78501b9459a02dc690e030e904494b613e5525aea3660a10b7cd",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "10",
+      "sourcePath": "pages/10-dashboard-agriculture.html",
+      "sourceSha256": "015a04e41e9638dcada4d672c9fb704e2d5bdd7f756dc4dfdf3ed2cef8372411",
+      "coverPath": "assets/images/covers/10.png",
+      "coverSha256": "006848996bf4e7d7dc83977e31cf4b470637fedeeed7e56fcd716dc09cd2250f",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "11",
+      "sourcePath": "pages/11-dashboard-oil-fats.html",
+      "sourceSha256": "31866b8c27d4d67f1944de206e97f01736f5586c44ad229d01f07a448a38f3db",
+      "coverPath": "assets/images/covers/11.png",
+      "coverSha256": "59a23ee79ef877b072947de71048151f06ea7f0cf8f914480e9ca38376f1ea3b",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "12",
+      "sourcePath": "pages/12-dashboard-meat.html",
+      "sourceSha256": "4e6a2dab7c5802c788448919e2e3cd451d213b7e769396d2ea790b8ac985849b",
+      "coverPath": "assets/images/covers/12.png",
+      "coverSha256": "05010a5751e3a1c3cb371cb4262f06bf69fbcfbbc4412a38a9cb0e2c09c9b5e1",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "13",
+      "sourcePath": "pages/13-dashboard-sugar.html",
+      "sourceSha256": "d43409757c3751c0b73e50c6b421a4a282f5bf4cae621023b18d8ea65362d889",
+      "coverPath": "assets/images/covers/13.png",
+      "coverSha256": "3b308025f4c8661e2940a918f8b0ef69d4653d1efed68e00dfc30b142621bc9f",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "14",
+      "sourcePath": "pages/14-infographic-landowners.html",
+      "sourceSha256": "af8101ea7fe2f31a14176e11df0248612b3e4d8fddad6f610822540e392d69a2",
+      "coverPath": "assets/images/covers/14.png",
+      "coverSha256": "ead0eb6a534f2c27972756f238eb67d86c403931324111a9bdb8e73479392976",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "15",
+      "sourcePath": "pages/15-3d-volume-bars.html",
+      "sourceSha256": "e07dfad59068e087bbc1c3c932191552972f009d3ce21d605ecf8aeb9576b96e",
+      "coverPath": "assets/images/covers/15.png",
+      "coverSha256": "e78f051a3906e9674a310e74b8d6c2ffbb349f2625a9f790cc6b9b50d343d1d3",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "16",
+      "sourcePath": "pages/16-business-model-chain.html",
+      "sourceSha256": "dde6613c489319433efc72907eea039c95a071c048941ea0e7a300ee2b49df95",
+      "coverPath": "assets/images/covers/16.png",
+      "coverSha256": "f49dfa0ef0986ea83b5cd3977e463ea2221b7c8906f5aef9740f3d3624a38dd6",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "17",
+      "sourcePath": "pages/17-export-structure-donut.html",
+      "sourceSha256": "0273ea8001d62411e611687284c1145f0ab154150387ea3e724e41b5c611a68f",
+      "coverPath": "assets/images/covers/17.png",
+      "coverSha256": "bc8c3bd85b250bd69f822bfee419dac95f195dc49ccd27f8dc69389f1c3d4a5e",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "18",
+      "sourcePath": "../单html文件/1.html",
+      "sourceSha256": "cbb16682048c22e66026ba10bd75812418b5f29b154aae5837fd77eca21b2e20",
+      "coverPath": "assets/images/covers/18.png",
+      "coverSha256": "dc462f2ce1bd079afe226e6185287f731b0cb445f68147db3faa6102120c45ad",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "19",
+      "sourcePath": "../单html文件/2.html",
+      "sourceSha256": "7fcea8cde60e4bd9b0216afa75a46f251fe8ff1c3a4e87691f8edfea66124fe2",
+      "coverPath": "assets/images/covers/19.png",
+      "coverSha256": "67a98ea6d07c8f6e8b5afe855c6408eae64cd6f5ff374dae93ef1d7f7c1cdb72",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "20",
+      "sourcePath": "../单html文件/3.html",
+      "sourceSha256": "ec5b01037d6c60e49e17ca00476b4409f91015e7ab9a127a79ca12bb79c4061a",
+      "coverPath": "assets/images/covers/20.png",
+      "coverSha256": "6c737022b46c6bb436232c0a081ff89b34fe225d68003f4f80200057eb0d59c8",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "21",
+      "sourcePath": "../单html文件/4.html",
+      "sourceSha256": "31b9833daab23f496a4a3292cc6d59bf3bb1a4c812d23eaa9148055352739433",
+      "coverPath": "assets/images/covers/21.png",
+      "coverSha256": "0450de82576ecd1ef878e673ae37ca91019284085c0668f2534f45f9bfb71638",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "22",
+      "sourcePath": "../单html文件/5.html",
+      "sourceSha256": "f792ac0ff94cdc82ef708ef4d17dd3734284b9b37882279fd7f33aa61c000c6d",
+      "coverPath": "assets/images/covers/22.png",
+      "coverSha256": "21275731d82122519eaf1b91d1f1e76deca8cfb853dd100f15adc85852cddab1",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "23",
+      "sourcePath": "../单html文件/6.html",
+      "sourceSha256": "f97a35d42cc1374eb961f9e6019de4aaa3b29dfa049335c3143ddb7aa8d2517b",
+      "coverPath": "assets/images/covers/23.png",
+      "coverSha256": "547b2cfd0966b5507b14cc533fd807e2a2a535859d74bdbc2e94e95b73864f56",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "24",
+      "sourcePath": "../单html文件/7.html",
+      "sourceSha256": "e4f9c9a69d621d22b29114f8d6bf70ea2f73de43dfb8f36ee8dba319460a75f7",
+      "coverPath": "assets/images/covers/24.png",
+      "coverSha256": "e983580fbc3e7f0592131149fd877f0ac212dc3636ef30f333a40f7064020f26",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "25",
+      "sourcePath": "../单html文件/8.html",
+      "sourceSha256": "74b41429ad10cc459acac826a5f3cebae47abd1ebbe095a21392b876f90cf22a",
+      "coverPath": "assets/images/covers/25.png",
+      "coverSha256": "131eefa0484f6f58d744991c5e220ddb87766b6e5b0202c685348a905ccad5ea",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "26",
+      "sourcePath": "../单html文件/9.html",
+      "sourceSha256": "a373e896b5e34a8feed44e48bb736399215591a7805fefddff570f2f103f01fb",
+      "coverPath": "assets/images/covers/26.png",
+      "coverSha256": "64b88d1fb315f07aefcf7aadaea5b3e912f576ae8a030a83628a45f24659fd60",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "27",
+      "sourcePath": "../单html文件/10.html",
+      "sourceSha256": "5a481b4d0fed1a7f474a164cf3209869fda183db744aab976bbab1f8be00fba3",
+      "coverPath": "assets/images/covers/27.png",
+      "coverSha256": "d7baf6a26e13331cb260eeccf033be60f12ee3bd164af1e2962604317a49f1f5",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "28",
+      "sourcePath": "../单html文件/11.html",
+      "sourceSha256": "80a92463edcf1198aa0e6e6d0b5726dc914eda62d498728b69ae83d7c2d9c8ac",
+      "coverPath": "assets/images/covers/28.png",
+      "coverSha256": "2b8de3f94c7d8603d09635098e7bdb4e47ba02cf550e09bc44e59f3e464f1dc9",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "29",
+      "sourcePath": "../单html文件/12.html",
+      "sourceSha256": "2799220a4108a4d0ce4d3086e7783718a40c5dec6a744f60dc02a26c440c9a00",
+      "coverPath": "assets/images/covers/29.png",
+      "coverSha256": "1487cec2028c28180cf67de1134938627a5227bc97f0942bb68e26587ad057c0",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "30",
+      "sourcePath": "../单html文件/13.html",
+      "sourceSha256": "5beb20ddef5b5943f5a18deeac577f5d638f645332f9c51d36f36c4c0e7078c7",
+      "coverPath": "assets/images/covers/30.png",
+      "coverSha256": "0dfa7c453153492ac393421d4f987d741e0c213cee5d9011029cb473c4c00dcf",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "31",
+      "sourcePath": "../单html文件/14.html",
+      "sourceSha256": "d7d02c028a4bba1df1207b449aa6b4c072f1e599a7a78d6b56449cf12c6d7a81",
+      "coverPath": "assets/images/covers/31.png",
+      "coverSha256": "c062505c56ac70f24f3efd5df671cd38ce0131925f9a3518718c131d4b7d2385",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "32",
+      "sourcePath": "../单html文件/15.html",
+      "sourceSha256": "229a916dc4b038e06a6799bb9ae5c7391f5bc90a027fa5e7a99374a0945e65dd",
+      "coverPath": "assets/images/covers/32.png",
+      "coverSha256": "c929affbc787f11dad7bf669f5e8f0d27817bf3d802b6d918d62322e6159fbd6",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "33",
+      "sourcePath": "../单html文件/16.html",
+      "sourceSha256": "1e9702f62ae448d355e4beed3f7c532768dab84b3d2e9892263966c6f8dbb42f",
+      "coverPath": "assets/images/covers/33.png",
+      "coverSha256": "cfe23df366fd2a23796340897c1343b861cce2b04252cded860f3c1cb90e05ec",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "34",
+      "sourcePath": "../单html文件/17.html",
+      "sourceSha256": "2f5abcce32f0c332cea18695f74d20577dde18f407c6a9cf75ce9eae9b1c18f4",
+      "coverPath": "assets/images/covers/34.png",
+      "coverSha256": "f9a405eb14888d4d4d27a506810712515c3bd244e135f47f0ac42312ea4387a4",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "35",
+      "sourcePath": "../单html文件/18.html",
+      "sourceSha256": "e041bcd3ac4d5bdda60449be619ea4ade1815ade8dc1e33db9aaf608172a1b63",
+      "coverPath": "assets/images/covers/35.png",
+      "coverSha256": "adba5d601c15b0b6c3ec05ed2c11db5606961635169254666e68fd2aa7351008",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "36",
+      "sourcePath": "../单html文件/19.html",
+      "sourceSha256": "3ccd85868a5ca032989a5d216370a8d919386d27d393cfd6d13e9c1f72bb94f0",
+      "coverPath": "assets/images/covers/36.png",
+      "coverSha256": "dfdf8415c2bd6907aa692b8690ab0169eeef2c3c0642871a4a494f55847bddf9",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "37",
+      "sourcePath": "../单html文件/20.html",
+      "sourceSha256": "9214b72b6ac51ce1e0bfd807aacde1649540600c40161917f25c66c148cb2d7f",
+      "coverPath": "assets/images/covers/37.png",
+      "coverSha256": "ab5daa7d4c6151ce837bdcfbf587d2282e03c42e76551117fffe95fbdd0435c8",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "38",
+      "sourcePath": "../单html文件/merged.html",
+      "sourceSha256": "ae8ad80da16ac6cfbf942def533f03ec26db48bac265a5a720ef059bd14f579e",
+      "coverPath": "assets/images/covers/38.png",
+      "coverSha256": "777ef4ed54a5814b333b1103caa41ce8992b153e441d5bd7a9980574a39f24b1",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "39",
+      "sourcePath": "../单html文件/music.html",
+      "sourceSha256": "62df5c7d842463490c1219f5f1d7b293fd9e70f7e46b755296f555ddbce5071a",
+      "coverPath": "assets/images/covers/39.png",
+      "coverSha256": "1ebff10ec3f6f7c69ebfd8de8892447762df66f923ba7f477e2fe55300c5bde7",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "40",
+      "sourcePath": "../单html文件/yanhua.html",
+      "sourceSha256": "f3ca74922baea7468d24e8a604fe977640d7886f51336cfa05d9ac1043f0e0bc",
+      "coverPath": "assets/images/covers/40.png",
+      "coverSha256": "78902a31797e6b5a361125082159b8f435f7969b5e990702fa21c9e6f90c2b4c",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "41",
+      "sourcePath": "../单html文件/yanse.html",
+      "sourceSha256": "5ad4a6bbda2f63e709af54f6cc73c0f7f09cbb098f5e421aa0b5f5f7a5f9f8d0",
+      "coverPath": "assets/images/covers/41.png",
+      "coverSha256": "8a1c80f9e178f1d2910c2b36299111c986dd187e280584166372fdf483f56ebb",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "42",
+      "sourcePath": "../3D卡片人物展示效果/index.html",
+      "sourceSha256": "d566944cd0233b56c43a6bcb9658d16911f75f1e1a70ed15a122fb26bb6f26f7",
+      "coverPath": "assets/images/covers/42.png",
+      "coverSha256": "08a537c0f64cfd7de0d9b4e0cbce69a8f41015c5e5408dac23d5e92f02f48bf7",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "id": "43",
+      "sourcePath": "../notes/index.html",
+      "sourceSha256": "3435cc6a2cc1bbb0ffae62db8b6d33276cc7f89400f968235a365b2fecc13829",
+      "coverPath": "assets/images/covers/43.png",
+      "coverSha256": "a912d7ac7f1bdf01a40a6f2f062255d5e9ffd2f572a4be56810a06a194671d79",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    }
+  ]
+}

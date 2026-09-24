@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DATAFLARE - Sales Performance Dashboard</title>
+    <!-- 引入 Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Chart.js 用于图表绘制 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    
+    <!-- 使用 Inter 字体 -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            /* 深色背景，比圣代页更深，以适应数据仪表盘的专业感 */
+            background-color: #120A1E; 
+            color: #E5E7EB; /* Light Gray Text */
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 自定义图表卡片样式 */
+        .chart-card {
+            background-color: #1C122C; /* 略浅的深紫色背景 */
+            border: 1px solid #4F46E533; /* 靛蓝色边框，轻微透明 */
+            border-radius: 1rem; /* 大圆角 */
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 目标进度条样式 */
+        .progress-bar {
+            height: 10px;
+            border-radius: 9999px;
+            background-color: #4F46E533; /* 浅色背景 */
+            overflow: hidden;
+        }
+
+        /* 模仿图片中漂浮的光晕和泡泡效果 */
+        .glow-sphere {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(138, 43, 226, 0.5); /* 鲜艳的紫色 */
+            filter: blur(50px);
+            opacity: 0.6;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .sphere-1 { top: 10%; left: 5%; background: rgba(245, 206, 80, 0.4); width: 80px; height: 80px; filter: blur(30px); } 
+        .sphere-2 { top: 20%; right: 10%; background: rgba(138, 43, 226, 0.7); width: 120px; height: 120px; opacity: 0.4; } 
+        .sphere-3 { bottom: 5%; left: 30%; background: rgba(255, 255, 255, 0.1); width: 60px; height: 60px; filter: blur(20px); } 
+        .sphere-4 { bottom: 25%; right: 5%; background: rgba(245, 206, 80, 0.4); width: 150px; height: 150px; opacity: 0.5; }
+    </style>
+</head>
+<body class="relative">
+
+    <!-- 抽象背景元素 - Glows and Spheres -->
+    <div class="glow-sphere sphere-1"></div>
+    <div class="glow-sphere sphere-2"></div>
+    <div class="glow-sphere sphere-3 hidden lg:block"></div>
+    <div class="glow-sphere sphere-4 hidden lg:block"></div>
+
+    <!-- 主容器 -->
+    <div class="relative z-10 max-w-7xl mx-auto p-4 md:p-8">
+
+        <!-- 导航栏 -->
+        <header class="flex justify-between items-center py-6 border-b border-indigo-500/30 mb-8">
+            <div class="flex items-center space-x-3">
+                <!-- Logo: DATAFLARE with colorful icon -->
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm1 12a1 1 0 11-2 0 1 1 0 012 0zm0-4a1 1 0 01-2 0V6a1 1 0 112 0v4z"></path></svg>
+                </div>
+                <span class="text-2xl font-extrabold text-gray-100 tracking-wider">DATAFLARE</span>
+            </div>
+            
+            <!-- 导航菜单 -->
+            <nav class="flex space-x-6 text-sm text-gray-400">
+                <a href="#" class="text-purple-400 border-b-2 border-purple-400 font-semibold pb-1 transition-colors">总览</a>
+                <a href="#" class="hover:text-purple-400 pb-1 transition-colors">报告</a>
+                <a href="#" class="hover:text-purple-400 pb-1 transition-colors">仪表盘</a>
+                <a href="#" class="hover:text-purple-400 pb-1 transition-colors">分析</a>
+                <a href="#" class="hover:text-purple-400 pb-1 transition-colors">设置</a>
+            </nav>
+        </header>
+
+        <!-- 标题 -->
+        <h1 class="text-3xl md:text-4xl font-bold mb-8">销售业绩仪表盘</h1>
+
+        <!-- 主要图表网格布局 (Row 1: Line & Donut) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            
+            <!-- 1. 月度营收折线图 -->
+            <div class="lg:col-span-2 chart-card h-80">
+                <h2 class="text-xl font-semibold mb-4">月度营收</h2>
+                <div class="flex items-end mb-4">
+                    <span class="text-4xl font-extrabold text-yellow-400 mr-4">¥120K</span>
+                    <span class="text-green-400 text-sm flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                        20% 增长
+                    </span>
+                </div>
+                <div class="h-48">
+                    <canvas id="monthlyRevenueChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 2. 产品市场份额甜甜圈图 -->
+            <div class="lg:col-span-1 chart-card h-80">
+                <h2 class="text-xl font-semibold mb-4">按产品划分的市场份额</h2>
+                <div class="h-56 flex items-center justify-center">
+                    <canvas id="marketShareChart"></canvas>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- 中/下部图表网格布局 (Row 2: Radar, Bar, Metrics Stack) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- 3. 季度销售概览雷达图 (保持不变) -->
+            <div class="lg:col-span-1 chart-card h-96">
+                <h2 class="text-xl font-semibold mb-4">季度销售概览 (雷达图)</h2>
+                <div class="h-80">
+                    <canvas id="quarterlySalesRadar"></canvas>
+                </div>
+            </div>
+            
+            <!-- 4. 产品类别销售对比 (新增 Bar Chart) -->
+            <div class="lg:col-span-1 chart-card h-96">
+                <h2 class="text-xl font-semibold mb-4">产品类别销售对比 (条形图)</h2>
+                <div class="h-80">
+                    <canvas id="productCategoryBarChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 5. 关键指标与活动流堆叠容器 (新增目标进度) -->
+            <div class="lg:col-span-1 flex flex-col space-y-6">
+                
+                <!-- 新增：季度目标达成进度 -->
+                <div class="chart-card flex-shrink-0">
+                    <h2 class="text-xl font-semibold mb-4">季度目标达成进度</h2>
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-lg font-bold text-indigo-400">目标：¥150K</p>
+                        <p class="text-xl font-extrabold text-yellow-400">80%</p>
+                    </div>
+                    <div class="progress-bar">
+                        <!-- 进度条填充 -->
+                        <div class="h-full bg-gradient-to-r from-purple-500 to-indigo-500" style="width: 80%;"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">已完成：¥120K / 目标：¥150K</p>
+                </div>
+
+                <!-- 关键指标卡片 (保持不变) -->
+                <div class="chart-card flex-shrink-0">
+                    <h2 class="text-xl font-semibold mb-4">关键指标</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-3 bg-purple-500/20 rounded-lg">
+                            <p class="text-xs text-gray-400">客户满意度</p>
+                            <p class="text-2xl font-bold text-yellow-400">95.8%</p>
+                        </div>
+                        <div class="p-3 bg-purple-500/20 rounded-lg">
+                            <p class="text-xs text-gray-400">新用户</p>
+                            <p class="text-2xl font-bold text-indigo-400">12,980</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 实时活动流 (保持不变) -->
+                <div class="chart-card flex-grow">
+                    <h2 class="text-xl font-semibold mb-4">实时活动流</h2>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex items-start justify-between">
+                            <div class="flex items-center">
+                                <span class="w-2 h-2 rounded-full bg-green-400 mr-3 mt-1"></span>
+                                <p><span class="font-bold">用户 "Alpha"</span> 生成了报告 (Sales_Q3)</p>
+                            </div>
+                            <span class="text-gray-500">5s ago</span>
+                        </li>
+                        <li class="flex items-start justify-between">
+                            <div class="flex items-center">
+                                <span class="w-2 h-2 rounded-full bg-red-400 mr-3 mt-1"></span>
+                                <p><span class="font-bold text-red-400">系统警报</span>: 数据库连接中断</p>
+                            </div>
+                            <span class="text-gray-500">1m</span>
+                        </li>
+                        <li class="flex items-start justify-between">
+                            <div class="flex items-center">
+                                <span class="w-2 h-2 rounded-full bg-indigo-400 mr-3 mt-1"></span>
+                                <p><span class="font-bold">团队</span> 完成了 Q2 数据整合</p>
+                            </div>
+                            <span class="text-gray-500">12m</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 新增行：极区图 (Rose Chart) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+            <!-- 6. 区域销售分布极区图 (原图表，移到新行，使其有独立空间) -->
+            <div class="lg:col-span-1 chart-card h-96">
+                <h2 class="text-xl font-semibold mb-4">区域销售分布 (极区图/玫瑰图)</h2>
+                <div class="h-80">
+                    <canvas id="regionalSalesPolar"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Chart.js 全局配置，用于深色主题
+        Chart.defaults.color = '#E5E7EB'; // 默认文字颜色
+        Chart.defaults.borderColor = '#4F46E533'; // 默认网格线颜色
+
+        // 颜色定义
+        const PURPLE = 'rgb(139, 92, 246)'; // Purple 500
+        const YELLOW = 'rgb(250, 204, 21)'; // Yellow 400
+        const INDIGO = 'rgb(99, 102, 241)'; // Indigo 500
+        const PINK = 'rgb(236, 72, 153)'; // Pink 500
+        const CYAN = 'rgb(6, 182, 212)'; // Cyan 500
+
+        /**
+         * 1. 月度营收折线图 (Line Chart)
+         */
+        const monthlyRevenueCtx = document.getElementById('monthlyRevenueChart').getContext('2d');
+        const monthlyRevenueChart = new Chart(monthlyRevenueCtx, {
+            type: 'line',
+            data: {
+                labels: ['2022 Q1', '2022 Q2', '2022 Q3', '2022 Q4', '2023 Q1', '2023 Q2'],
+                datasets: [{
+                    label: '营收 (K)',
+                    data: [80, 85, 95, 105, 110, 120],
+                    borderColor: YELLOW,
+                    backgroundColor: 'rgba(250, 204, 21, 0.2)', // 填充区域颜色
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: YELLOW
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: '#1C122C',
+                        titleColor: '#E5E7EB',
+                        bodyColor: '#D1D5DB'
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false }
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        /**
+         * 2. 产品市场份额甜甜圈图 (Doughnut Chart)
+         */
+        const marketShareCtx = document.getElementById('marketShareChart').getContext('2d');
+        const marketShareChart = new Chart(marketShareCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['产品线 A', '产品线 B', '产品线 C'],
+                datasets: [{
+                    data: [45, 30, 25], // 市场份额百分比
+                    backgroundColor: [INDIGO, YELLOW, PURPLE],
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%', // 甜甜圈图的中心空洞大小
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#E5E7EB',
+                            usePointStyle: true
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += context.parsed + '%';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 甜甜圈中心文本插件 (模仿图片中的 45%)
+        const centerTextPlugin = {
+            id: 'centerText',
+            beforeDraw: (chart) => {
+                const { ctx, chartArea: { top, bottom, left, right, width, height }, config } = chart;
+                ctx.save();
+                
+                // 绘制中心文本
+                const text = '45%';
+                ctx.font = 'bolder 32px Inter';
+                ctx.fillStyle = '#E5E7EB';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const x = left + width / 2;
+                const y = top + height / 2;
+                ctx.fillText(text, x, y);
+                
+                // 绘制副标题
+                const subText = '产品线 A';
+                ctx.font = '12px Inter';
+                ctx.fillStyle = '#9CA3AF'; // Gray 400
+                ctx.fillText(subText, x, y + 25);
+
+                ctx.restore();
+            }
+        };
+        marketShareChart.options.plugins.centerText = centerTextPlugin;
+        marketShareChart.update();
+
+
+        /**
+         * 3. 季度销售概览雷达图 (Radar Chart)
+         */
+        const quarterlySalesRadarCtx = document.getElementById('quarterlySalesRadar').getContext('2d');
+        new Chart(quarterlySalesRadarCtx, {
+            type: 'radar',
+            data: {
+                labels: ['质量', '速度', '服务', '创新', '定价', '市场覆盖'],
+                datasets: [{
+                    label: 'Q4 表现',
+                    data: [85, 75, 90, 80, 65, 95],
+                    backgroundColor: 'rgba(139, 92, 246, 0.4)', // PURPLE with transparency
+                    borderColor: PURPLE,
+                    pointBackgroundColor: PURPLE,
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: PURPLE
+                }, {
+                    label: '目标',
+                    data: [80, 80, 80, 80, 80, 80],
+                    backgroundColor: 'rgba(250, 204, 21, 0.2)', // YELLOW with transparency
+                    borderColor: YELLOW,
+                    pointBackgroundColor: YELLOW,
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: YELLOW
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            color: '#E5E7EB',
+                            usePointStyle: true
+                        }
+                    }
+                },
+                scales: {
+                    r: {
+                        angleLines: {
+                            color: '#4F46E533' // Indigo transparent
+                        },
+                        grid: {
+                            color: '#4F46E533'
+                        },
+                        pointLabels: {
+                            color: '#D1D5DB'
+                        },
+                        suggestedMin: 0,
+                        suggestedMax: 100,
+                        ticks: {
+                            display: false // 隐藏刻度值
+                        }
+                    }
+                }
+            }
+        });
+
+        /**
+         * 4. 产品类别销售对比 (Bar Chart) - 新增
+         */
+        const productCategoryBarCtx = document.getElementById('productCategoryBarChart').getContext('2d');
+        new Chart(productCategoryBarCtx, {
+            type: 'bar',
+            data: {
+                labels: ['软件', '服务', '硬件', '订阅'],
+                datasets: [{
+                    label: '本月销售额 (K)',
+                    data: [55, 70, 40, 65],
+                    backgroundColor: [INDIGO, PURPLE, CYAN, YELLOW],
+                    borderColor: [INDIGO, PURPLE, CYAN, YELLOW],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false }
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+
+        /**
+         * 5. 区域销售分布极区图 (Polar Area Chart) - 类似玫瑰图
+         */
+        const regionalSalesPolarCtx = document.getElementById('regionalSalesPolar').getContext('2d');
+        new Chart(regionalSalesPolarCtx, {
+            type: 'polarArea',
+            data: {
+                labels: ['华东', '华南', '华中', '华北'],
+                datasets: [{
+                    data: [35, 25, 15, 25],
+                    backgroundColor: [INDIGO, PURPLE, YELLOW, PINK],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#E5E7EB',
+                            usePointStyle: true
+                        }
+                    },
+                    tooltip: {
+                         callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    // 假设数据是百分比
+                                    label += context.parsed + '%'; 
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    r: {
+                        grid: {
+                            color: '#4F46E533'
+                        },
+                        ticks: {
+                            display: false // 隐藏刻度值
+                        }
+                    }
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>

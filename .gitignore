@@ -1,0 +1,10 @@
+.DS_Store
+.env
+.env.*
+**/admin/
+**/tests/
+**/docs/
+**/.superpowers/
+**/__pycache__/
+**/*.php
+node_modules/

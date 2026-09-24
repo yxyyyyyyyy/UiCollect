@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>社交调研-移动版</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Noto Sans SC -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #f2f4f7;
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: none; /* 防止iOS橡皮筋效果 */
+        }
+        /* 隐藏滚动条但保留滚动功能 */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* 底部弹窗动画 */
+        .bottom-sheet {
+            transition: transform 0.3s ease-out;
+            transform: translateY(100%);
+        }
+        .bottom-sheet.active {
+            transform: translateY(0);
+        }
+        /* 点赞动画 */
+        @keyframes like-bounce {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        .animate-like {
+            animation: like-bounce 0.3s;
+        }
+    </style>
+</head>
+<body class="text-gray-800 pb-20"> <!-- pb-20 为底部导航栏留空 -->
+
+    <!-- 1. 顶部导航 (Top Bar) -->
+    <header class="fixed top-0 w-full bg-white z-40 shadow-sm px-4 h-14 flex items-center justify-between">
+        <div class="font-bold text-lg text-blue-600 tracking-tight">
+            <i class="fa-brands fa-hive"></i> 智社与研
+        </div>
+        
+        <!-- 顶部选项卡 -->
+        <div class="flex gap-6 text-base font-medium">
+            <span class="text-gray-900 border-b-2 border-blue-600 pb-1">关注</span>
+            <span class="text-gray-400">推荐</span>
+            <span class="text-gray-400">热榜</span>
+        </div>
+
+        <div class="text-gray-500 text-lg">
+            <i class="fas fa-search"></i>
+        </div>
+    </header>
+
+    <!-- 2. 信息流区域 (Main Feed) -->
+    <main id="feed-container" class="pt-16 px-0 space-y-2">
+        <!-- JS将在此处动态插入内容 -->
+        
+        <!-- 模拟加载状态 -->
+        <div class="py-8 text-center text-gray-400 text-xs">
+            <i class="fas fa-circle-notch fa-spin mr-1"></i> 正在加载更多数据...
+        </div>
+    </main>
+
+    <!-- 3. 悬浮发布按钮 (FAB) -->
+    <button onclick="openPublishModal()" class="fixed bottom-20 right-4 w-14 h-14 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center text-xl z-30 hover:bg-blue-700 active:scale-95 transition">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- 4. 底部导航栏 (Bottom Tab Bar) -->
+    <nav class="fixed bottom-0 w-full bg-white border-t border-gray-100 h-16 flex justify-around items-center z-40 pb-1">
+        <a href="#" class="flex flex-col items-center text-blue-600 w-full">
+            <i class="fas fa-home text-xl mb-0.5"></i>
+            <span class="text-[10px]">首页</span>
+        </a>
+        <a href="#" class="flex flex-col items-center text-gray-400 w-full hover:text-gray-600">
+            <i class="fas fa-compass text-xl mb-0.5"></i>
+            <span class="text-[10px]">发现</span>
+        </a>
+        <a href="#" class="flex flex-col items-center text-gray-400 w-full hover:text-gray-600 relative">
+            <i class="fas fa-comment-dots text-xl mb-0.5"></i>
+            <span class="text-[10px]">消息</span>
+            <span class="absolute top-0 right-6 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+        </a>
+        <a href="#" onclick="toggleProfileDrawer()" class="flex flex-col items-center text-gray-400 w-full hover:text-gray-600">
+            <i class="fas fa-user text-xl mb-0.5"></i>
+            <span class="text-[10px]">我的</span>
+        </a>
+    </nav>
+
+    <!-- === Modals / Drawers === -->
+
+    <!-- 遮罩层 (Overlay) -->
+    <div id="overlay" onclick="closeAllModals()" class="fixed inset-0 bg-black/60 z-50 hidden transition-opacity opacity-0"></div>
+
+    <!-- 转发/调研 底部弹窗 (Share Bottom Sheet) -->
+    <div id="share-sheet" class="fixed bottom-0 left-0 w-full bg-white rounded-t-2xl z-50 bottom-sheet p-5 pb-8">
+        <div class="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-4"></div>
+        <h3 class="font-bold text-gray-800 mb-4 text-center">转发至动态</h3>
+        
+        <div class="bg-gray-50 p-3 rounded-lg text-sm text-gray-500 mb-4 line-clamp-2 border-l-2 border-blue-500 italic" id="share-preview-text">
+            预览内容...
+        </div>
+
+        <textarea id="share-input" class="w-full bg-gray-50 rounded-lg p-3 text-sm mb-4 outline-none focus:ring-1 focus:ring-blue-500 resize-none" rows="3" placeholder="写点什么..."></textarea>
+        
+        <!-- 隐性调研：转发原因 -->
+        <div class="mb-6">
+            <p class="text-xs font-bold text-gray-400 mb-2 uppercase">您转发主要是为了：</p>
+            <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                <label class="flex-shrink-0 border border-gray-200 rounded-full px-3 py-1.5 text-xs flex items-center gap-2 has-[:checked]:bg-blue-50 has-[:checked]:border-blue-500 has-[:checked]:text-blue-600 transition">
+                    <input type="radio" name="share_reason" value="agree" class="hidden">
+                    <i class="far fa-thumbs-up"></i> 表示认同
+                </label>
+                <label class="flex-shrink-0 border border-gray-200 rounded-full px-3 py-1.5 text-xs flex items-center gap-2 has-[:checked]:bg-blue-50 has-[:checked]:border-blue-500 has-[:checked]:text-blue-600 transition">
+                    <input type="radio" name="share_reason" value="disagree" class="hidden">
+                    <i class="far fa-thumbs-down"></i> 表示反对/批判
+                </label>
+                <label class="flex-shrink-0 border border-gray-200 rounded-full px-3 py-1.5 text-xs flex items-center gap-2 has-[:checked]:bg-blue-50 has-[:checked]:border-blue-500 has-[:checked]:text-blue-600 transition">
+                    <input type="radio" name="share_reason" value="save" class="hidden">
+                    <i class="far fa-bookmark"></i> 仅收藏备忘
+                </label>
+            </div>
+        </div>
+
+        <button onclick="confirmShare()" class="w-full bg-blue-600 text-white font-medium py-3 rounded-xl hover:bg-blue-700 active:bg-blue-800 transition">发送</button>
+    </div>
+
+    <!-- 发布内容全屏弹窗 (Publish Modal) -->
+    <div id="publish-modal" class="fixed inset-0 bg-white z-50 hidden flex flex-col">
+        <div class="flex justify-between items-center px-4 h-14 border-b border-gray-100">
+            <button onclick="closeAllModals()" class="text-gray-500">取消</button>
+            <button onclick="submitPost()" class="bg-blue-600 text-white px-4 py-1.5 rounded-full text-sm font-medium">发布</button>
+        </div>
+        <div class="p-4 flex-1">
+            <textarea id="main-post-input" class="w-full h-40 text-base outline-none resize-none placeholder-gray-400" placeholder="分享新鲜事..."></textarea>
+            
+            <div class="grid grid-cols-4 gap-4 mt-4">
+                <div class="aspect-square bg-gray-50 rounded-lg flex flex-col items-center justify-center text-gray-400 border border-dashed border-gray-300">
+                    <i class="fas fa-camera text-xl mb-1"></i>
+                    <span class="text-xs">照片</span>
+                </div>
+                <div class="aspect-square bg-gray-50 rounded-lg flex flex-col items-center justify-center text-gray-400 border border-dashed border-gray-300">
+                    <i class="fas fa-video text-xl mb-1"></i>
+                    <span class="text-xs">视频</span>
+                </div>
+                <div class="aspect-square bg-gray-50 rounded-lg flex flex-col items-center justify-center text-gray-400 border border-dashed border-gray-300">
+                    <i class="fas fa-hashtag text-xl mb-1"></i>
+                    <span class="text-xs">话题</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 个人中心侧边抽屉/弹窗 (Profile Drawer) -->
+    <div id="profile-drawer" class="fixed bottom-0 left-0 w-full bg-white rounded-t-2xl z-50 bottom-sheet p-6 h-[70vh]">
+        <div class="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-6"></div>
+        
+        <div class="flex items-center gap-4 mb-8">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="w-16 h-16 rounded-full border-2 border-white shadow">
+            <div>
+                <h2 class="text-xl font-bold">调研观察员007</h2>
+                <div class="flex gap-4 text-sm mt-1">
+                    <span><strong class="text-gray-900">142</strong> <span class="text-gray-500">关注</span></span>
+                    <span><strong class="text-gray-900">3.8k</strong> <span class="text-gray-500">粉丝</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 行为数据日志（调研员专用） -->
+        <div class="bg-gray-900 text-green-400 p-4 rounded-xl font-mono text-xs mb-6 h-48 overflow-y-auto shadow-inner">
+            <div class="flex justify-between border-b border-gray-700 pb-2 mb-2 sticky top-0 bg-gray-900">
+                <span><i class="fas fa-terminal"></i> 实时行为日志</span>
+            </div>
+            <div id="mobile-behavior-log" class="space-y-1.5">
+                <p>> Session started...</p>
+            </div>
+        </div>
+
+        <!-- 满意度问卷入口 -->
+        <div class="bg-indigo-50 p-4 rounded-xl flex items-center justify-between" onclick="alert('进入详细问卷页面...')">
+            <div>
+                <div class="font-bold text-indigo-900">填写体验问卷</div>
+                <div class="text-xs text-indigo-600">帮助我们改进算法推荐</div>
+            </div>
+            <i class="fas fa-chevron-right text-indigo-400"></i>
+        </div>
+    </div>
+
+    <script>
+        // --- Mock Data ---
+        // 混合了帖子、广告、话题推荐的数据流
+        const feedData = [
+            {
+                type: 'post',
+                id: 101,
+                author: "央视新闻",
+                avatar: "https://api.dicebear.com/7.x/initials/svg?seed=CCTV",
+                verified: true,
+                sourceTag: "官方媒体",
+                sourceColor: "text-blue-600 bg-blue-50",
+                time: "10分钟前",
+                content: "【最新】国家数据局正式挂牌成立。这一里程碑事件标志着数字中国建设进入新阶段。 #时政新闻#",
+                images: ["https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=600&auto=format&fit=crop&q=60"],
+                stats: { likes: 3420, comments: 520, shares: 120 }
+            },
+            {
+                type: 'ad', // 广告植入
+                id: 'ad_01',
+                title: "更懂你的智能座驾 - FutureCar X",
+                image: "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=600&auto=format&fit=crop&q=60",
+                buttonText: "立即预约试驾"
+            },
+            {
+                type: 'post',
+                id: 102,
+                author: "数码评测君",
+                avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Tech",
+                verified: false,
+                sourceTag: "自媒体",
+                sourceColor: "text-orange-600 bg-orange-50",
+                time: "45分钟前",
+                content: "家人们谁懂啊！这台新手机的夜景拍摄简直是夜视仪级别的！直接看样张👇",
+                images: ["https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&auto=format&fit=crop&q=60"],
+                stats: { likes: 89, comments: 23, shares: 5 }
+            },
+            {
+                type: 'topic', // 话题推荐植入
+                id: 'topic_01',
+                title: "#职场35岁门槛#",
+                desc: "1230.5万人在讨论 · 社会热点",
+                action: "参与讨论"
+            },
+            {
+                type: 'post',
+                id: 103,
+                author: "用户9527",
+                avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=User",
+                verified: false,
+                sourceTag: "普通用户",
+                sourceColor: "text-gray-500 bg-gray-100",
+                time: "2小时前",
+                content: "今天下班路上的晚霞太美了，治愈了一整天的疲惫。🌆",
+                images: ["https://images.unsplash.com/photo-1495616811223-4d98c6e9d869?w=600&auto=format&fit=crop&q=60"],
+                stats: { likes: 12, comments: 2, shares: 0 }
+            }
+        ];
+
+        // --- Logic ---
+        
+        // 渲染信息流
+        function renderFeed() {
+            const container = document.getElementById('feed-container');
+            let html = '';
+
+            feedData.forEach(item => {
+                if(item.type === 'post') {
+                    // 普通帖子
+                    html += `
+                        <div class="bg-white p-4 mb-2 shadow-sm" onclick="logAction('view_post', ${item.id})">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex gap-3">
+                                    <img src="${item.avatar}" class="w-10 h-10 rounded-full bg-gray-100">
+                                    <div class="flex flex-col">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="font-bold text-base text-gray-900">${item.author}</span>
+                                            ${item.verified ? '<i class="fas fa-check-circle text-blue-500 text-xs"></i>' : ''}
+                                        </div>
+                                        <div class="flex items-center gap-2 text-xs">
+                                            <span class="text-gray-400">${item.time}</span>
+                                            <span class="${item.sourceColor} px-1.5 py-0.5 rounded text-[10px]">${item.sourceTag}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="text-gray-400"><i class="fas fa-ellipsis-h"></i></button>
+                            </div>
+                            
+                            <div class="text-base text-gray-800 leading-relaxed mb-3">
+                                ${item.content}
+                            </div>
+                            
+                            ${item.images && item.images.length ? `
+                                <div class="mb-3 rounded-lg overflow-hidden">
+                                    <img src="${item.images[0]}" class="w-full h-48 object-cover">
+                                </div>
+                            ` : ''}
+
+                            <div class="flex justify-between items-center px-4 pt-2 border-t border-gray-50">
+                                <button onclick="event.stopPropagation(); handleLike(this, ${item.id})" class="flex items-center gap-1.5 text-gray-500 active:text-pink-500 transition group">
+                                    <i class="far fa-heart text-lg group-active:animate-like"></i>
+                                    <span class="text-xs">${item.stats.likes}</span>
+                                </button>
+                                <button class="flex items-center gap-1.5 text-gray-500 active:text-blue-500 transition">
+                                    <i class="far fa-comment text-lg"></i>
+                                    <span class="text-xs">${item.stats.comments}</span>
+                                </button>
+                                <button onclick="event.stopPropagation(); openShareSheet(${item.id}, '${item.content.substring(0, 20)}...')" class="flex items-center gap-1.5 text-gray-500 active:text-green-500 transition">
+                                    <i class="fas fa-share text-lg"></i>
+                                    <span class="text-xs">${item.stats.shares}</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else if (item.type === 'ad') {
+                    // 广告卡片
+                    html += `
+                        <div class="bg-white p-0 mb-2 shadow-sm" onclick="logAction('click_ad', '${item.id}')">
+                            <div class="relative">
+                                <img src="${item.image}" class="w-full h-40 object-cover">
+                                <span class="absolute top-2 right-2 bg-black/30 text-white text-[10px] px-1.5 py-0.5 rounded backdrop-blur-sm">广告</span>
+                            </div>
+                            <div class="p-3 flex justify-between items-center">
+                                <div>
+                                    <h4 class="font-bold text-sm text-gray-800">${item.title}</h4>
+                                    <p class="text-xs text-gray-400 mt-0.5">赞助商提供</p>
+                                </div>
+                                <button class="text-blue-600 border border-blue-600 px-3 py-1 rounded-full text-xs font-medium">${item.buttonText}</button>
+                            </div>
+                        </div>
+                    `;
+                } else if (item.type === 'topic') {
+                    // 话题卡片
+                    html += `
+                        <div class="bg-gradient-to-r from-orange-50 to-pink-50 p-4 mb-2 shadow-sm flex justify-between items-center" onclick="logAction('click_topic', '${item.title}')">
+                            <div>
+                                <div class="font-bold text-gray-800 mb-1 flex items-center gap-2">
+                                    <i class="fas fa-hashtag text-orange-500"></i> ${item.title}
+                                </div>
+                                <div class="text-xs text-gray-500">${item.desc}</div>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-300"></i>
+                        </div>
+                    `;
+                }
+            });
+            container.innerHTML = html;
+        }
+
+        // --- Interaction Logic ---
+        
+        let currentShareId = null;
+
+        function logAction(action, detail) {
+            const logEl = document.getElementById('mobile-behavior-log');
+            const p = document.createElement('p');
+            const time = new Date().toLocaleTimeString().split(' ')[0];
+            p.textContent = `[${time}] ${action}: ${detail}`;
+            logEl.prepend(p);
+            console.log(`Log: ${action}`, detail);
+        }
+
+        function handleLike(btn, id) {
+            const icon = btn.querySelector('i');
+            const span = btn.querySelector('span');
+            
+            if(icon.classList.contains('far')) {
+                icon.classList.replace('far', 'fas');
+                icon.classList.add('text-pink-500');
+                btn.classList.add('text-pink-500');
+                icon.classList.add('animate-like');
+                span.textContent = parseInt(span.textContent) + 1;
+                logAction('like', id);
+            } else {
+                icon.classList.replace('fas', 'far');
+                icon.classList.remove('text-pink-500', 'animate-like');
+                btn.classList.remove('text-pink-500');
+                span.textContent = parseInt(span.textContent) - 1;
+                logAction('unlike', id);
+            }
+        }
+
+        // Modal Controls
+        function openShareSheet(id, previewText) {
+            currentShareId = id;
+            document.getElementById('share-preview-text').textContent = previewText;
+            document.getElementById('overlay').classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('overlay').classList.remove('opacity-0');
+                document.getElementById('share-sheet').classList.add('active');
+            }, 10);
+            logAction('open_share', id);
+        }
+
+        function toggleProfileDrawer() {
+            const drawer = document.getElementById('profile-drawer');
+            const overlay = document.getElementById('overlay');
+            
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                overlay.classList.remove('opacity-0');
+                drawer.classList.add('active');
+            }, 10);
+            logAction('view_profile', 'self');
+        }
+
+        function openPublishModal() {
+            document.getElementById('publish-modal').classList.remove('hidden');
+            logAction('open_publish', 'fab');
+        }
+
+        function closeAllModals() {
+            const sheets = document.querySelectorAll('.bottom-sheet');
+            sheets.forEach(s => s.classList.remove('active'));
+            
+            document.getElementById('overlay').classList.add('opacity-0');
+            document.getElementById('publish-modal').classList.add('hidden');
+            
+            setTimeout(() => {
+                document.getElementById('overlay').classList.add('hidden');
+            }, 300);
+        }
+
+        function confirmShare() {
+            const reason = document.querySelector('input[name="share_reason"]:checked')?.value || "none";
+            const text = document.getElementById('share-input').value;
+            
+            logAction('share_confirm', `ID:${currentShareId} Reason:${reason}`);
+            
+            closeAllModals();
+            document.getElementById('share-input').value = "";
+            
+            // Toast notification
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/70 text-white px-4 py-2 rounded-lg text-sm z-[60]';
+            toast.innerText = '已转发至动态';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+
+        function submitPost() {
+            const content = document.getElementById('main-post-input').value;
+            if(!content) return;
+            
+            // Add to feed (simulated)
+            const newPost = {
+                type: 'post',
+                id: Date.now(),
+                author: "调研观察员007",
+                avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
+                verified: false,
+                sourceTag: "普通用户",
+                sourceColor: "text-gray-500 bg-gray-100",
+                time: "刚刚",
+                content: content,
+                images: [],
+                stats: { likes: 0, comments: 0, shares: 0 }
+            };
+            
+            // Insert at top
+            feedData.unshift(newPost);
+            renderFeed();
+            
+            logAction('publish_success', content.substring(0,10));
+            document.getElementById('main-post-input').value = "";
+            closeAllModals();
+        }
+
+        // Init
+        window.onload = renderFeed;
+
+    </script>
+</body>
+</html>

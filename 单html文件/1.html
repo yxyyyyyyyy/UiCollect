@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>粒子星座连线互动画板</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 p5.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    
+    <style>
+        /* 强制 body 占满全屏，防止滚动条 */
+        html, body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            cursor: default;
+        }
+        /* Canvas 容器样式 */
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+        }
+        body { background: radial-gradient(circle at 34% 44%, #182d53 0%, #0b152c 43%, #070c1d 100%); font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; }
+        #controls { width: 270px; background: rgba(12,20,43,.76); border-left: 1px solid rgba(180,207,255,.17); box-shadow: -28px 0 80px rgba(0,0,0,.16); }
+        #controls h2 { font-size: 19px; letter-spacing: .08em; }
+        #controls .rounded-lg { border: 1px solid rgba(192,210,255,.12); border-radius: 16px; }
+        #clear-button { background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.18); }
+        #clear-button:hover { background: rgba(255,255,255,.16); }
+        .canvas-intro { position: fixed; top: 8%; left: 6%; z-index: 2; pointer-events: none; color: #f5f4ff; }
+        .canvas-intro small { display: block; color: #a5c8ea; letter-spacing: .28em; font-size: 11px; }
+        .canvas-intro h1 { margin: 15px 0 10px; font-size: clamp(34px, 4vw, 64px); letter-spacing: .06em; font-weight: 300; line-height: 1.15; }
+        .canvas-intro p { color: #afbed9; font-size: 13px; letter-spacing: .1em; }
+        @media (max-width: 700px) { #controls { top: auto; bottom: 0; width: 100%; height: auto; max-height: 37vh; padding: 16px; border-left: 0; border-top: 1px solid rgba(180,207,255,.17); } #controls h2 { margin-bottom: 10px; padding-bottom: 9px; } #controls .mb-6, #controls .mb-8 { margin-bottom: 10px; padding: 8px; } .canvas-intro { top: 4%; left: 5%; } .canvas-intro p { max-width: 220px; } }
+        @media (prefers-reduced-motion: reduce) { * { transition-duration: 0s !important; } }
+    </style>
+
+    <script>
+        // 配置 Tailwind CSS 颜色
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'deep-blue': '#0F172A',
+                        'light-purple': '#8B5CF6',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-deep-blue">
+
+    <!-- 画布容器 -->
+    <div id="canvas-container"></div>
+    <div class="canvas-intro" aria-hidden="true"><small>INTERACTIVE CONSTELLATION</small><h1>把星光，连成故事。</h1><p>点击添星 · 拖动重排 · 双击摘下</p></div>
+
+    <!-- 右侧工具栏 (Tailwind CSS 样式) -->
+    <div id="controls" class="fixed top-0 right-0 h-full w-80 bg-white/10 backdrop-blur-md p-6 shadow-2xl z-20 overflow-y-auto">
+        
+        <h2 class="text-2xl font-bold text-white border-b border-white/20 pb-4 mb-6 tracking-wider">
+            ✨ 星座画板控制
+        </h2>
+
+        <!-- 连线粗细调节 -->
+        <div class="mb-6 p-4 bg-white/5 rounded-lg">
+            <label for="line-thickness" class="block text-sm font-medium text-white mb-2">连线粗细 (Line Thickness)</label>
+            <input type="range" id="line-thickness" min="0.5" max="5" step="0.1" value="1.5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg">
+            <span id="line-thickness-value" class="text-xs text-white/70 mt-1 block text-right">1.5 px</span>
+        </div>
+
+        <!-- 粒子密度调节 (每粒子最大连线数) -->
+        <div class="mb-6 p-4 bg-white/5 rounded-lg">
+            <label for="max-connections" class="block text-sm font-medium text-white mb-2">粒子密度/连线限制</label>
+            <input type="range" id="max-connections" min="1" max="6" step="1" value="3" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg">
+            <span id="max-connections-value" class="text-xs text-white/70 mt-1 block text-right">3 条线/粒子</span>
+        </div>
+
+        <!-- 连线颜色模式 -->
+        <div class="mb-8 p-4 bg-white/5 rounded-lg">
+            <label class="block text-sm font-medium text-white mb-3">连线颜色模式</label>
+            <div class="flex flex-col space-y-3 text-white">
+                <label class="inline-flex items-center">
+                    <input type="radio" name="line-color-mode" value="solid" checked class="form-radio text-light-purple h-4 w-4">
+                    <span class="ml-2">单色 (浅紫#8B5CF6)</span>
+                </label>
+                <label class="inline-flex items-center">
+                    <input type="radio" name="line-color-mode" value="gradient" class="form-radio text-light-purple h-4 w-4">
+                    <span class="ml-2">渐变 (紫 -> 蓝)</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="space-y-4">
+            <button id="save-button" class="w-full py-3 bg-light-purple hover:bg-opacity-90 text-white font-bold rounded-lg shadow-lg transition-all duration-200">
+                💾 保存星座图案 (PNG 透明背景)
+            </button>
+            <button id="clear-button" class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-colors duration-200">
+                🔄 清空画板
+            </button>
+            <p class="text-xs text-white/50 pt-4 border-t border-white/10">
+            点击生成星点，拖动调整位置，双击删除，滚轮调整大小。
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // --- P5.js 核心代码 ---
+
+        let particles = [];
+        let maxConnections = 3;
+        let connectionRadius = 250;
+        let lineThickness = 1.5;
+        let lineColorMode = 'solid';
+
+        let draggingParticle = null;
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+        // 星辰粒子类
+        class Star {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = 5;
+                this.targetSize = 5; // 目标大小，用于平滑缩放
+                this.opacity = 0; // 用于淡入动画
+                this.isDragging = false;
+            }
+
+            // 更新粒子大小和淡入
+            update() {
+                // 滚轮缩放平滑过渡
+                this.size = lerp(this.size, this.targetSize, 0.1);
+                // 淡入动画
+                this.opacity = min(255, this.opacity + 20);
+            }
+
+            // 渲染粒子 (带发光效果)
+            display() {
+                noStroke();
+                fill(255, this.opacity);
+
+                // 发光效果 (使用 shadowBlur)
+                drawingContext.shadowBlur = 10;
+                drawingContext.shadowColor = color(255, 255, 255, this.opacity);
+                
+                ellipse(this.x, this.y, this.size, this.size);
+                
+                drawingContext.shadowBlur = 0; // 及时关闭阴影，避免影响后续绘制
+            }
+
+            // 检查是否被点击
+            isInside(px, py) {
+                let d = dist(this.x, this.y, px, py);
+                // 扩大点击区域，便于操作
+                return d < this.size * 2 + 10; 
+            }
+        }
+
+        // p5.js setup 函数
+        window.setup = function() {
+            // 创建适应窗口的画布，并放入容器
+            const canvas = createCanvas(windowWidth, windowHeight);
+            canvas.parent('canvas-container');
+            pixelDensity(1); // 提高渲染质量
+            frameRate(reducedMotion.matches ? 16 : 30);
+            seedConstellation();
+
+            // 初始化 UI 控件事件监听
+            setupUIControls();
+        }
+
+        function seedConstellation() {
+            const usableWidth = Math.max(320, width - (width < 700 ? 0 : 270));
+            const centerX = usableWidth * .49;
+            const centerY = height * .53;
+            const scale = Math.min(usableWidth / 900, height / 720, 1.2);
+            const shape = [
+                [-280,-35],[-228,-86],[-167,-54],[-106,-114],[-43,-68],[31,-118],
+                [102,-72],[177,-109],[244,-52],[293,11],[216,36],[149,0],
+                [90,76],[13,49],[-69,114],[-141,54],[-215,102],[-279,53],
+                [-105,192],[-14,177],[83,185],[175,153]
+            ];
+            particles = shape.map(([x,y], index) => {
+                const star = new Star(centerX + x * scale, centerY + y * scale);
+                star.opacity = 255;
+                star.size = star.targetSize = index % 5 === 0 ? 8 : 5;
+                return star;
+            });
+        }
+        
+        // p5.js draw 函数
+        window.draw = function() {
+            if (document.hidden) return;
+            background('#0b142b');
+            
+            drawStarryBackground(); // 绘制稀疏的背景星星
+
+            // 1. 绘制连线
+            drawConnections();
+
+            // 2. 更新和渲染粒子
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].display();
+            }
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) noLoop();
+            else { loop(); redraw(); }
+        });
+        reducedMotion.addEventListener?.('change', event => frameRate(event.matches ? 16 : 30));
+        
+        // 绘制背景稀疏的星星
+        function drawStarryBackground() {
+            noStroke();
+            fill(255, 50);
+            for (let i = 0; i < 50; i++) { // 绘制50个固定的星星
+                ellipse(
+                    (i * 12345) % width, 
+                    (i * 54321) % height, 
+                    1.5, 1.5
+                );
+            }
+        }
+
+        // 绘制连线逻辑 (实现连线带渐变透明度)
+        function drawConnections() {
+            for (let i = 0; i < particles.length; i++) {
+                let p1 = particles[i];
+                let connectionsCount = 0;
+                let sortedNeighbors = [];
+
+                // 收集邻居粒子及其距离
+                for (let j = 0; j < particles.length; j++) {
+                    if (i === j) continue;
+                    let p2 = particles[j];
+                    let d = dist(p1.x, p1.y, p2.x, p2.y);
+
+                    if (d < connectionRadius) {
+                        sortedNeighbors.push({ particle: p2, distance: d });
+                    }
+                }
+
+                // 按距离排序，确保只连接最近的 maxConnections 个粒子
+                sortedNeighbors.sort((a, b) => a.distance - b.distance);
+
+                for (let k = 0; k < min(maxConnections, sortedNeighbors.length); k++) {
+                    let neighbor = sortedNeighbors[k];
+                    let p2 = neighbor.particle;
+                    let d = neighbor.distance;
+                    
+                    // 计算透明度和弹性 (距离越远，透明度越低)
+                    let alpha = map(d, 0, connectionRadius, 255, 0);
+                    let weight = map(d, 0, connectionRadius, lineThickness * 1.5, lineThickness * 0.5); // 模拟弹性粗细变化
+
+                    strokeWeight(weight);
+                    
+                    if (lineColorMode === 'solid') {
+                        // 单色模式: 浅紫
+                        stroke(139, 92, 246, alpha); // #8B5CF6
+                    } else {
+                        // 渐变模式: 从浅紫到深蓝/白
+                        let c = lerpColor(color('#8B5CF6'), color('#FFFFFF'), d / connectionRadius);
+                        stroke(red(c), green(c), blue(c), alpha);
+                    }
+                    
+                    line(p1.x, p1.y, p2.x, p2.y);
+                }
+            }
+        }
+
+        // --- 交互事件处理 ---
+
+        window.mousePressed = function() {
+            // 忽略点击 UI 区域
+            if (mouseX > width - 270 && width >= 700) return;
+
+            // 检查是否点击到现有粒子
+            for (let p of particles) {
+                if (p.isInside(mouseX, mouseY)) {
+                    draggingParticle = p;
+                    p.isDragging = true;
+                    // 立即退出，进入拖拽模式
+                    return; 
+                }
+            }
+            
+            // 否则，生成新粒子
+            if (mouseX >= 0 && mouseX < width && mouseY >= 0 && mouseY < height) {
+                particles.push(new Star(mouseX, mouseY));
+            }
+        }
+
+        window.mouseDragged = function() {
+            // 忽略拖拽 UI 区域
+            if (mouseX > width - 270 && width >= 700) return;
+            
+            // 拖拽粒子=调整位置
+            if (draggingParticle) {
+                draggingParticle.x = mouseX;
+                draggingParticle.y = mouseY;
+            }
+        }
+
+        window.mouseReleased = function() {
+            // 结束拖拽
+            if (draggingParticle) {
+                draggingParticle.isDragging = false;
+                draggingParticle = null;
+            }
+        }
+
+        // 双击粒子=删除该粒子
+        window.doubleClicked = function() {
+            // 忽略双击 UI 区域
+            if (mouseX > width - 270 && width >= 700) return;
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                if (particles[i].isInside(mouseX, mouseY)) {
+                    particles.splice(i, 1);
+                    return;
+                }
+            }
+        }
+
+        // 滚轮=控制粒子大小
+        window.mouseWheel = function(event) {
+            // 忽略滚轮 UI 区域
+            if (mouseX > width - 270 && width >= 700) return;
+
+            let targetP = null;
+            
+            // 查找光标最近的粒子
+            let minD = Infinity;
+            for (let p of particles) {
+                let d = dist(p.x, p.y, mouseX, mouseY);
+                if (d < minD) {
+                    minD = d;
+                    targetP = p;
+                }
+            }
+
+            if (targetP) {
+                // 滚轮上滑 (event.delta < 0) = 变大
+                if (event.delta < 0) {
+                    targetP.targetSize = min(targetP.targetSize + 1, 20);
+                } else {
+                    // 滚轮下滑 (event.delta > 0) = 变小
+                    targetP.targetSize = max(targetP.targetSize - 1, 3);
+                }
+                // 阻止页面滚动
+                return false; 
+            }
+        }
+
+        // --- UI 逻辑绑定 ---
+
+        function setupUIControls() {
+            // 连线粗细
+            const thicknessSlider = document.getElementById('line-thickness');
+            const thicknessValue = document.getElementById('line-thickness-value');
+            thicknessSlider.addEventListener('input', (e) => {
+                lineThickness = parseFloat(e.target.value);
+                thicknessValue.innerText = `${lineThickness.toFixed(1)} px`;
+            });
+
+            // 粒子密度
+            const densitySlider = document.getElementById('max-connections');
+            const densityValue = document.getElementById('max-connections-value');
+            densitySlider.addEventListener('input', (e) => {
+                maxConnections = parseInt(e.target.value);
+                densityValue.innerText = `${maxConnections} 条线/粒子`;
+            });
+            
+            // 连线颜色模式
+            document.querySelectorAll('input[name="line-color-mode"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    lineColorMode = e.target.value;
+                });
+            });
+
+            // 清空按钮
+            document.getElementById('clear-button').addEventListener('click', () => {
+                particles = [];
+            });
+
+            // 保存按钮 (导出PNG透明背景)
+            document.getElementById('save-button').addEventListener('click', () => {
+                // 1. 隐藏 UI，只保留 Canvas 内容
+                document.getElementById('controls').style.display = 'none';
+
+                // 2. 强制绘制一帧 (确保 UI 隐藏生效)
+                redraw(); 
+
+                // 3. 导出画布 (p5.js saveCanvas 会自动使用透明背景)
+                saveCanvas('星座图案_透明', 'png');
+                
+                // 4. 延迟显示 UI
+                setTimeout(() => {
+                    document.getElementById('controls').style.display = 'block';
+                }, 500); 
+            });
+        }
+        
+        // 窗口大小变化时调整 Canvas 尺寸
+        window.windowResized = function() {
+            resizeCanvas(windowWidth, windowHeight);
+        }
+
+    </script>
+</body>
+</html>

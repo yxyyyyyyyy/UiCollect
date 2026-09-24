@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10种科普炫酷效果展示</title>
+    <!-- 引入 Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 使用 Inter 字体 */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        :root {
+            --primary-color: #6366f1; /* Indigo-500 */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0121;
+        }
+
+        /* --- 效果 1: 漂浮方块动画 (Cubes) --- */
+        .cubes-bg {
+            background: linear-gradient(135deg, #1f013d 0%, #080016 100%);
+        }
+        .cube {
+            position: absolute;
+            list-style: none;
+            display: block;
+            background: rgba(255, 255, 255, 0.08);
+            animation: cubeAnimate 25s linear infinite;
+            bottom: -150px;
+            border-radius: 8px;
+            backdrop-filter: blur(2px);
+        }
+        .cube:nth-child(1) { left: 25%; width: 80px; height: 80px; animation-delay: 0s; animation-duration: 15s; }
+        .cube:nth-child(2) { left: 10%; width: 20px; height: 20px; animation-delay: 2s; animation-duration: 12s; }
+        .cube:nth-child(3) { left: 70%; width: 20px; height: 20px; animation-delay: 4s; animation-duration: 24s; }
+        .cube:nth-child(4) { left: 40%; width: 60px; height: 60px; animation-delay: 0s; animation-duration: 18s; }
+        .cube:nth-child(5) { left: 65%; width: 20px; height: 20px; animation-delay: 3s; animation-duration: 20s; }
+        .cube:nth-child(6) { left: 75%; width: 110px; height: 110px; animation-delay: 0s; animation-duration: 12s; }
+        .cube:nth-child(7) { left: 35%; width: 150px; height: 150px; animation-delay: 7s; animation-duration: 35s; }
+        @keyframes cubeAnimate {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 8px; }
+            50% { opacity: 0.5; transform: translateY(-500px) rotate(360deg) scale(1.1); }
+            100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 50%; }
+        }
+        
+        /* --- 效果 2: 脉冲按钮动画 (Pulsing Button) --- */
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(99, 102, 241, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        }
+        .pulse-button {
+            animation: pulseGlow 2s infinite;
+        }
+
+        /* --- 效果 4: 简谐运动 - 钟摆 (Pendulum) --- */
+        @keyframes swing {
+            0% { transform: rotate(30deg); }
+            100% { transform: rotate(-30deg); }
+        }
+        .pendulum-pivot {
+            width: 2px;
+            height: 150px;
+            background-color: white;
+            transform-origin: top center;
+            animation: swing 2s ease-in-out infinite alternate;
+        }
+        .pendulum-bob {
+            width: 30px;
+            height: 30px;
+            background-color: #ef4444; /* Red */
+            border-radius: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* --- 效果 6: 行星轨道模拟 (Orbit) --- */
+        @keyframes orbit-slow {
+            to { transform: rotate(360deg); }
+        }
+        .sun { width: 40px; height: 40px; background-color: #f59e0b; border-radius: 50%; box-shadow: 0 0 15px #f59e0b; }
+        .orbit-path {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 250px;
+            height: 250px;
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            animation: orbit-slow 10s linear infinite;
+        }
+        .planet {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 15px;
+            height: 15px;
+            background-color: #3b82f6; /* Blue */
+            border-radius: 50%;
+        }
+
+        /* --- 效果 7: 无限滚动条 (Infinite Marquee) --- */
+        .marquee {
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: marqueeScroll 20s linear infinite;
+            padding-left: 100%; /* 起始位置 */
+        }
+        @keyframes marqueeScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* --- 效果 9: 玻璃拟态卡片 (Glassmorphism) --- */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        /* 隐藏效果容器，只显示激活的那个 */
+        .effect-container { display: none; }
+        .effect-container.active { 
+            display: flex;
+            min-height: 500px;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <div class="flex flex-col md:flex-row min-h-screen">
+        
+        <!-- 侧边导航栏 -->
+        <nav class="w-full md:w-64 bg-indigo-900/50 p-4 border-r border-indigo-700/50 md:sticky md:top-0 h-auto md:h-screen overflow-y-auto">
+            <h2 class="text-2xl font-bold text-white mb-6 border-b border-indigo-600 pb-3">炫酷效果库 (科普版)</h2>
+            <ul id="nav-list">
+                <!-- 导航项将由 JS 渲染 -->
+            </ul>
+        </nav>
+
+        <!-- 主内容区域 / 效果展示区 -->
+        <main class="flex-1 p-6 md:p-10 text-white relative">
+            <h1 class="text-4xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-500 drop-shadow-lg">
+                效果预览
+            </h1>
+
+            <!-- 效果 1: 抽象漂浮方块 (Floating Cubes) -->
+            <div id="effect-1" class="effect-container active relative rounded-xl overflow-hidden shadow-2xl">
+                <div class="cubes-bg absolute inset-0">
+                    <ul class="absolute top-0 left-0 w-full h-full">
+                        <li class="cube"></li>
+                        <li class="cube"></li>
+                        <li class="cube"></li>
+                        <li class="cube"></li>
+                        <li class="cube"></li>
+                        <li class="cube"></li>
+                        <li class="cube"></li>
+                    </ul>
+                </div>
+                <div class="relative z-10 flex flex-col items-center justify-center w-full p-8 text-center bg-black/30">
+                    <h2 class="text-4xl font-bold mb-4">抽象漂浮方块</h2>
+                    <p class="text-indigo-200">纯 CSS 动画，创造一个在背景中持续上升和旋转的粒子效果。</p>
+                </div>
+            </div>
+            
+            <!-- 效果 2: 脉冲按钮 (Pulsing Button) -->
+            <div id="effect-2" class="effect-container items-center justify-center">
+                <button class="pulse-button bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-full shadow-lg transition duration-300 ease-in-out">
+                    点击我 (脉冲光晕)
+                </button>
+            </div>
+            
+            <!-- 效果 3: 文本打字效果 (Typing Text) -->
+            <div id="effect-3" class="effect-container flex-col items-center justify-center">
+                <div class="border-r-4 border-white pr-2 h-10 w-96 text-center text-3xl font-mono whitespace-nowrap overflow-hidden" id="typing-text-area">
+                    <!-- JS 将在这里打字 -->
+                </div>
+                <p class="mt-4 text-indigo-300">使用 JavaScript 模拟文本输入的渐进式打字效果。</p>
+            </div>
+
+            <!-- 效果 4: 简谐运动 - 钟摆 (Pendulum) -->
+            <div id="effect-4" class="effect-container flex-col items-center justify-start pt-16">
+                <div class="w-1 h-8 bg-indigo-500 rounded-b"></div> <!-- 支撑点 -->
+                <div class="pendulum-pivot relative">
+                    <div class="absolute bottom-0 left-1/2 pendulum-bob"></div>
+                </div>
+                <p class="mt-8 text-indigo-300">纯 CSS 模拟简谐运动（钟摆），演示周期性。</p>
+            </div>
+            
+            <!-- 效果 5: 3D 翻转卡片 (3D Flip Card) -->
+            <div id="effect-5" class="effect-container items-center justify-center">
+                <div class="flip-card w-64 h-80">
+                    <div class="flip-card-inner w-full h-full rounded-xl shadow-2xl">
+                        <div class="flip-card-front bg-indigo-500 flex items-center justify-center rounded-xl p-4">
+                            <h3 class="text-3xl font-bold">正面 (Hover Me)</h3>
+                        </div>
+                        <div class="flip-card-back bg-pink-500 flex items-center justify-center rounded-xl p-4">
+                            <p class="text-xl text-center">这是一个纯 CSS 3D 翻转效果。只需要 `:hover` 伪类和 `transform-style: preserve-3d`。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 效果 6: 行星轨道模拟 (Orbit) -->
+            <div id="effect-6" class="effect-container items-center justify-center relative">
+                <div class="relative flex items-center justify-center w-full h-full">
+                    <div class="sun relative z-10"></div>
+                    <div class="orbit-path">
+                        <div class="planet"></div>
+                    </div>
+                </div>
+                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <h2 class="text-3xl font-bold mb-1 pt-12">行星轨道</h2>
+                    <p class="text-indigo-300">CSS 旋转动画模拟恒星周围的行星轨道。</p>
+                </div>
+            </div>
+
+            <!-- 效果 7: 无限滚动条 (Infinite Marquee) -->
+            <div id="effect-7" class="effect-container flex-col justify-center">
+                <div class="marquee bg-indigo-700/50 p-4 rounded-xl border border-indigo-500">
+                    <div class="marquee-content text-4xl font-extrabold text-yellow-300">
+                        &nbsp;&nbsp;&nbsp;✨ 炫酷效果 • 持续滚动 • CSS Marquee 动画 • 响应式设计 • 持续滚动 • 炫酷效果 ✨
+                    </div>
+                </div>
+            </div>
+
+            <!-- 效果 8: 斐波那契螺旋线 (Fibonacci Spiral) -->
+            <div id="effect-8" class="effect-container items-center justify-center flex-col">
+                <svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto max-w-xs md:max-w-md">
+                    <title>斐波那契螺旋线</title>
+                    <!-- 外框线 -->
+                    <rect x="0" y="0" width="400" height="400" fill="none" stroke="rgba(255, 255, 255, 0.2)" stroke-width="1"/>
+            
+                    <!-- 斐波那契方块 (1, 1, 2, 3, 5, 8, ...) -->
+                    <rect x="200" y="100" width="100" height="100" fill="#a5b4fc" opacity="0.8"/>
+                    <rect x="100" y="100" width="100" height="100" fill="#6366f1" opacity="0.8"/>
+                    <rect x="100" y="200" width="200" height="100" fill="#4f46e5" opacity="0.8"/>
+                    <rect x="300" y="100" width="100" height="300" fill="#f472b6" opacity="0.8"/>
+                    <rect x="100" y="0" width="300" height="100" fill="#f97316" opacity="0.8"/>
+                    
+                    <!-- 黄金螺旋线 (Arc segments based on square sizes) -->
+                    <path d="M 300 200 A 100 100 0 0 0 200 300 L 200 300 A 200 200 0 0 1 0 100 A 300 300 0 0 1 300 0 A 400 400 0 0 1 400 400"
+                          fill="none" stroke="#facc15" stroke-width="4" stroke-linecap="round"/>
+                    
+                </svg>
+                <p class="mt-4 text-indigo-300 text-center">SVG 演示自然界中的斐波那契数列和黄金分割螺旋线。</p>
+            </div>
+
+            <!-- 效果 9: 玻璃拟态卡片 (Glassmorphism) -->
+            <div id="effect-9" class="effect-container items-center justify-center" style="background: url('https://placehold.co/800x600/1F013D/A8A8F5?text=Background+Art') center center/cover;">
+                <div class="glass-card w-72 h-72 rounded-3xl p-6 flex flex-col justify-center items-center text-center shadow-2xl">
+                    <h3 class="text-3xl font-bold text-white mb-2">玻璃卡片</h3>
+                    <p class="text-indigo-200">背景模糊、半透明和阴影，创造出现代感十足的玻璃拟态效果。</p>
+                </div>
+            </div>
+            
+            <!-- 效果 10: 细胞生长模拟 (JS/Canvas) -->
+            <div id="effect-10" class="effect-container flex-col items-center justify-center">
+                <canvas id="cell-canvas" width="400" height="300" class="bg-black rounded-xl shadow-xl border border-indigo-700"></canvas>
+                <p class="mt-4 text-indigo-300">使用 Canvas 模拟简单的细胞生长和分裂过程。</p>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        const effects = [
+            { id: 'effect-1', title: '1. 抽象漂浮方块 (CSS)' },
+            { id: 'effect-2', title: '2. 脉冲按钮 (CSS)' },
+            { id: 'effect-3', title: '3. 文本打字效果 (JS)' },
+            { id: 'effect-4', title: '4. 简谐运动 - 钟摆 (CSS)' },
+            { id: 'effect-5', title: '5. 3D 翻转卡片 (CSS)' },
+            { id: 'effect-6', title: '6. 行星轨道模拟 (CSS)' },
+            { id: 'effect-7', title: '7. 无限滚动 Marquee (CSS)' },
+            { id: 'effect-8', title: '8. 斐波那契螺旋线 (SVG)' },
+            { id: 'effect-9', title: '9. 玻璃拟态卡片 (CSS)' },
+            { id: 'effect-10', title: '10. 细胞生长模拟 (JS/Canvas)' }
+        ];
+
+        let activeEffectId = 'effect-1';
+
+        // --- 初始化函数 ---
+        function initialize() {
+            renderNav();
+            // 确保页面加载完成后，canvas元素存在，才能激活 effect-10
+            activateEffect(activeEffectId); 
+        }
+
+        // --- 渲染导航栏 ---
+        function renderNav() {
+            const navList = document.getElementById('nav-list');
+            navList.innerHTML = effects.map(effect => `
+                <li class="mb-2">
+                    <a href="#" data-id="${effect.id}" class="nav-item block p-3 rounded-lg transition duration-150 ease-in-out text-sm font-medium ${effect.id === activeEffectId ? 'bg-indigo-700 text-white shadow-md' : 'text-indigo-300 hover:bg-indigo-700/70 hover:text-white'}" onclick="handleNavClick('${effect.id}', event)">
+                        ${effect.title}
+                    </a>
+                </li>
+            `).join('');
+        }
+
+        // --- 导航点击处理 ---
+        function handleNavClick(id, event) {
+            event.preventDefault();
+            activateEffect(id);
+        }
+
+        // --- 激活效果 ---
+        function activateEffect(id) {
+            // 1. 更新激活ID
+            activeEffectId = id;
+
+            // 2. 清理所有 JS 动画 (打字机和 Canvas)
+            if (window.typingInterval) {
+                clearInterval(window.typingInterval);
+                window.typingInterval = null;
+            }
+            if (window.cellAnimationId) {
+                cancelAnimationFrame(window.cellAnimationId);
+                window.cellAnimationId = null;
+            }
+
+            // 3. 隐藏所有效果容器
+            document.querySelectorAll('.effect-container').forEach(container => {
+                container.classList.remove('active');
+            });
+
+            // 4. 显示目标效果容器
+            const targetContainer = document.getElementById(id);
+            if (targetContainer) {
+                targetContainer.classList.add('active');
+            }
+
+            // 5. 更新导航栏样式
+            renderNav();
+
+            // 6. 触发特定效果的初始化逻辑
+            if (id === 'effect-3') {
+                initTypingEffect();
+            } else if (id === 'effect-10') {
+                initCellDivision();
+            }
+        }
+
+        // --- 效果 3: 打字机效果逻辑 ---
+        const typingText = "欢迎来到炫酷效果展示网站！请尽情探索。";
+        const typingSpeed = 100; // 毫秒
+
+        function initTypingEffect() {
+            const textArea = document.getElementById('typing-text-area');
+            if (!textArea) return; 
+            let i = 0;
+            textArea.textContent = ''; // 清空内容
+
+            function typeChar() {
+                if (i < typingText.length) {
+                    textArea.textContent += typingText.charAt(i);
+                    i++;
+                } else {
+                    // 结束后清除 interval，3秒后重新开始
+                    clearInterval(window.typingInterval);
+                    setTimeout(initTypingEffect, 3000); 
+                }
+            }
+            window.typingInterval = setInterval(typeChar, typingSpeed);
+        }
+        
+        // --- 效果 10: 细胞生长模拟逻辑 (Canvas) ---
+        function initCellDivision() {
+            const canvas = document.getElementById('cell-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width;
+            const H = canvas.height;
+
+            // 细胞对象
+            let cell = {
+                x: W / 2,
+                y: H / 2,
+                radius: 10,
+                color: '#10b981', // Emerald green
+                maxRadius: 60,
+                growing: true
+            };
+
+            function drawCell() {
+                ctx.beginPath();
+                ctx.arc(cell.x, cell.y, cell.radius, 0, Math.PI * 2);
+                ctx.fillStyle = cell.color;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = cell.color;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+
+            function update() {
+                // 清除画布
+                ctx.clearRect(0, 0, W, H);
+                
+                // 生长/分裂逻辑
+                if (cell.growing) {
+                    cell.radius += 0.3;
+                    if (cell.radius >= cell.maxRadius) {
+                        // 模拟分裂：重置并使其停止生长一段时间
+                        cell.growing = false;
+                        cell.color = '#fcd34d'; // 变成黄色，模拟准备分裂
+                        setTimeout(() => {
+                            cell.radius = 10;
+                            cell.growing = true;
+                            cell.color = '#10b981'; // 分裂完成，变回绿色，重新开始生长
+                        }, 1000); 
+                    }
+                }
+                
+                drawCell();
+                window.cellAnimationId = requestAnimationFrame(update);
+            }
+            
+            // 确保没有其他动画在运行
+            if (window.cellAnimationId) {
+                cancelAnimationFrame(window.cellAnimationId);
+            }
+            
+            update(); // 启动动画循环
+        }
+
+
+        // 页面加载完成后启动
+        window.onload = initialize;
+
+    </script>
+
+</body>
+</html>

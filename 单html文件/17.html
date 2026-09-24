@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>可爱萌宠背单词 App - 交互增强版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Zcool+KuaiLe&display=swap');
+
+        :root {
+            --bg-color: #F9FBE7;
+            --text-brown: #5D4037;
+            --accent-green: #AED581;
+            --accent-yellow: #FFF9C4;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            font-family: 'Quicksand', 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: var(--text-brown);
+            overflow: hidden; /* 防止body滚动 */
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .app-container {
+            width: 375px;
+            height: 812px;
+            background-color: var(--bg-color);
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-bg {
+            background: linear-gradient(180deg, #E6EE9C 0%, #F9FBE7 100%);
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 280px; z-index: 0;
+            transition: all 0.5s ease;
+        }
+
+        .search-bar {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid transparent;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        .search-bar:focus-within {
+            background: white;
+            border-color: #AED581;
+            box-shadow: 0 4px 12px rgba(174, 213, 129, 0.3);
+            transform: scale(1.02);
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(139, 195, 74, 0.1);
+            transition: transform 0.2s;
+        }
+        .card:active { transform: scale(0.98); }
+
+        /* 按钮动画增强 */
+        .btn-primary, .btn-secondary {
+            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary {
+            background-color: #AED581; color: #33691E;
+            box-shadow: 0 4px 0 #8BC34A;
+        }
+        .btn-secondary {
+            background-color: #FFF9C4; color: #795548;
+            border: 1px solid #FFF59D;
+            box-shadow: 0 4px 0 #FFF176;
+        }
+        .btn-primary:active, .btn-secondary:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 transparent;
+        }
+
+        /* 点击波纹效果 */
+        .ripple {
+            position: absolute;
+            background: rgba(255,255,255,0.4);
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple-anim 0.6s linear;
+            pointer-events: none;
+        }
+        @keyframes ripple-anim {
+            to { transform: scale(4); opacity: 0; }
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            background: white;
+            border-top-left-radius: 24px; border-top-right-radius: 24px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.03);
+            z-index: 50;
+        }
+        .nav-item { transition: all 0.3s; }
+        .nav-item.active { transform: translateY(-5px); }
+        .nav-item.active span { color: #558B2F; font-weight: 800; }
+        .nav-item.active svg { stroke: #558B2F; stroke-width: 2.5px; }
+
+        /* Toast 通知 */
+        .toast {
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 100;
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--text-brown);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: max-content;
+            max-width: 90%;
+        }
+        .toast.show { top: 60px; opacity: 1; }
+
+        /* 学习模态框 */
+        .study-modal {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #F9FBE7;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .study-modal.open { transform: translateY(0); }
+
+        /* 翻卡效果 */
+        .flashcard {
+            perspective: 1000px;
+            width: 280px; height: 360px;
+            margin: 0 auto;
+            position: relative;
+            cursor: pointer;
+        }
+        .flashcard-inner {
+            position: relative; width: 100%; height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back {
+            position: absolute; width: 100%; height: 100%;
+            -webkit-backface-visibility: hidden; backface-visibility: hidden;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border-radius: 24px;
+            background: white; border: 4px solid #AED581;
+        }
+        .flashcard-back { transform: rotateY(180deg); background: #FFF9C4; border-color: #FFF59D; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Toast 通知组件 -->
+        <div id="toast" class="toast">
+            <i data-lucide="check-circle" size="20" class="text-green-500"></i>
+            <span id="toast-msg">操作成功</span>
+        </div>
+
+        <!-- 学习模式全屏覆盖层 -->
+        <div id="studyModal" class="study-modal p-6">
+            <div class="flex justify-between items-center mb-8">
+                <div class="flex gap-2">
+                    <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                    <span class="text-xs font-bold text-gray-500">学习中...</span>
+                </div>
+                <button onclick="closeStudyMode()" class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm">
+                    <i data-lucide="x" size="20"></i>
+                </button>
+            </div>
+
+            <div class="flex-1 flex flex-col justify-center mb-10">
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <span class="text-4xl font-bold mb-4">Hamster</span>
+                            <span class="text-gray-400 text-sm">点击翻转查看释义</span>
+                            <div class="mt-8 text-6xl">🐹</div>
+                        </div>
+                        <div class="flashcard-back">
+                            <span class="text-3xl font-bold mb-2 text-[#5D4037]">仓鼠</span>
+                            <span class="text-sm text-gray-500 bg-white/50 px-3 py-1 rounded-full mb-4">名词 (n.)</span>
+                            <p class="px-6 text-sm text-gray-600 leading-relaxed">
+                                一种可爱的小型啮齿动物，常作为宠物饲养。<br>
+                                "The hamster is eating a sunflower seed."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <button onclick="nextCard(false)" class="h-14 rounded-2xl bg-red-100 text-red-500 font-bold border-2 border-red-200 active:scale-95 transition">
+                    不认识
+                </button>
+                <button onclick="nextCard(true)" class="h-14 rounded-2xl bg-green-100 text-green-600 font-bold border-2 border-green-200 active:scale-95 transition">
+                    认识
+                </button>
+            </div>
+        </div>
+
+        <!-- 主界面内容 -->
+        <div class="header-bg"></div>
+
+        <div class="w-full h-12 z-10 flex justify-between items-end px-6 pb-2 text-xs font-bold text-[#556B2F]">
+            <span>9:41</span>
+            <div class="flex gap-1">
+                <i data-lucide="signal" size="14"></i>
+                <i data-lucide="wifi" size="14"></i>
+                <i data-lucide="battery-medium" size="14"></i>
+            </div>
+        </div>
+
+        <div class="z-10 px-4 flex items-center justify-between mt-2 mb-4">
+            <div class="flex-1 search-bar h-10 flex items-center px-3 gap-2">
+                <i data-lucide="search" size="18" class="text-gray-400"></i>
+                <input type="text" placeholder="查询中文或英文" class="bg-transparent border-none outline-none text-sm text-gray-600 w-full placeholder-gray-400">
+            </div>
+            <div class="flex gap-3 ml-3 text-[#795548]">
+                <div class="cursor-pointer active:scale-90 transition" onclick="showToast('今日已成功签到！')">
+                    <i data-lucide="calendar-check" size="24"></i>
+                </div>
+                <div class="relative cursor-pointer active:scale-90 transition" onclick="toggleNotif(this)">
+                    <i data-lucide="bell" size="24"></i>
+                    <span id="notif-dot" class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-400 rounded-full border-2 border-[#E6EE9C]"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto no-scrollbar z-10 px-4 pb-20 scroll-smooth">
+            
+            <div class="flex justify-center items-end h-20 mb-[-10px] relative z-20 pointer-events-none">
+                <div class="text-6xl drop-shadow-lg transform -translate-x-2 animate-bounce" style="animation-duration: 2s">🐹</div>
+                <div class="text-6xl drop-shadow-lg transform translate-x-2 scale-x-[-1] animate-bounce" style="animation-duration: 2.2s">🐹</div>
+                <div class="absolute top-0 right-10 text-yellow-400 text-xl animate-pulse">✨</div>
+            </div>
+
+            <!-- 书籍卡片 -->
+            <div class="card p-4 mb-4 relative z-10">
+                <div class="flex items-start gap-4">
+                    <div id="book-cover" class="w-16 h-20 bg-[#C5E1A5] rounded-lg shadow-sm flex flex-col items-center justify-center border-2 border-[#AED581] relative overflow-hidden transition-all duration-300">
+                        <div class="w-full h-2 bg-white opacity-30 absolute top-4"></div>
+                        <span id="book-lang" class="text-[10px] font-bold text-white mt-2">英语</span>
+                        <div class="w-8 h-8 rounded-full bg-white/50 flex items-center justify-center mt-1 text-xs">📖</div>
+                    </div>
+                    
+                    <div class="flex-1">
+                        <div class="flex justify-between items-start">
+                            <h3 id="book-title" class="font-bold text-lg text-[#5D4037]">人教版一年级上</h3>
+                            <button onclick="changeBook()" class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full hover:bg-gray-200 active:bg-gray-300 transition">换书 ></button>
+                        </div>
+                        
+                        <div class="w-full h-2.5 bg-gray-100 rounded-full mt-3 overflow-hidden">
+                            <div id="progress-bar" class="h-full bg-[#AED581] w-1/3 rounded-full transition-all duration-500"></div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-xs font-bold text-[#5D4037]"><span id="unit-count">1</span>/3 <span class="text-gray-400 font-normal">单元</span></span>
+                            <div class="flex gap-2">
+                                <button onclick="resetProgress()" class="text-[10px] bg-[#FFF9C4] text-[#795548] px-2 py-1 rounded-lg font-bold hover:bg-[#FFF59D] active:scale-95 transition">重置词书</button>
+                                <button onclick="showToast('已按词表顺序排序')" class="text-[10px] bg-white border border-gray-200 text-gray-500 px-2 py-1 rounded-lg active:scale-95 transition">词表顺序 ></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="flex justify-center items-center mb-2">
+                    <h3 class="font-bold text-[#5D4037]">今日计划</h3>
+                    <i data-lucide="clipboard-list" size="14" class="ml-1 text-gray-400"></i>
+                </div>
+                
+                <div class="flex justify-around items-end mb-6">
+                    <div class="text-center group cursor-pointer" onclick="showToast('剩余 14 个新词待学')">
+                        <div class="text-2xl font-black text-[#5D4037] group-hover:text-[#AED581] transition">1/15</div>
+                        <div class="text-xs text-gray-400 font-bold">新词</div>
+                    </div>
+                    <div class="h-8 w-[1px] bg-gray-200 mb-1"></div>
+                    <div class="text-center group cursor-pointer" onclick="showToast('太棒了，没有待复习的内容！')">
+                        <div class="text-2xl font-black text-[#5D4037] group-hover:text-[#AED581] transition">0/0</div>
+                        <div class="text-xs text-gray-400 font-bold">复习</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 px-2">
+                    <button onclick="startStudy()" class="btn-primary h-14 rounded-2xl font-bold text-lg flex items-center justify-center relative overflow-hidden">
+                        继续新学
+                    </button>
+                    <button onclick="incrementProgress()" class="btn-secondary h-14 rounded-2xl font-bold text-lg flex items-center justify-center">
+                        复 习
+                    </button>
+                </div>
+            </div>
+
+            <!-- 功能网格 -->
+            <div class="grid grid-cols-4 gap-y-6 mt-8">
+                <!-- 生成带点击事件的网格项 -->
+                <div class="flex flex-col items-center cursor-pointer active:scale-95 transition" onclick="showToast('已打卡，获得5积分！')">
+                    <div class="grid-item-icon bg-[#E1F5FE] text-[#29B6F6]">📅</div>
+                    <span class="text-[10px] font-bold text-gray-500">签到打卡</span>
+                </div>
+                <div class="flex flex-col items-center cursor-pointer active:scale-95 transition" onclick="showToast('进入拼写查核模式')">
+                    <div class="grid-item-icon bg-[#FFF3E0] text-[#FFB74D]">📝</div>
+                    <span class="text-[10px] font-bold text-gray-500">拼写查核</span>
+                </div>
+                <div class="flex flex-col items-center cursor-pointer active:scale-95 transition" onclick="showToast('准备播放听写音频...')">
+                    <div class="grid-item-icon bg-[#E8F5E9] text-[#66BB6A]">✍️</div>
+                    <span class="text-[10px] font-bold text-gray-500">单词听写</span>
+                </div>
+                <div class="flex flex-col items-center cursor-pointer active:scale-95 transition" onclick="showToast('查词功能加载中')">
+                    <div class="grid-item-icon bg-[#F3E5F5] text-[#AB47BC]">🔍</div>
+                    <span class="text-[10px] font-bold text-gray-500">查词/翻译</span>
+                </div>
+                
+                <div class="flex flex-col items-center cursor-pointer active:scale-95 transition" onclick="showToast('打开例句填空练习')">
+                    <div class="grid-item-icon bg-[#FFEBEE] text-[#EF5350]">📚</div>
+                    <span class="text-[10px] font-bold text-gray-500">例句填空</span>
+                </div>
+                <div class="flex flex-col items-center cursor-pointer active:scale-95 transition" onclick="showToast('开始连连看游戏！')">
+                    <div class="grid-item-icon bg-[#E0F7FA] text-[#26C6DA]">🔄</div>
+                    <span class="text-[10px] font-bold text-gray-500">单词配对</span>
+                </div>
+                <div class="flex flex-col items-center cursor-pointer active:scale-95 transition" onclick="showToast('极速模式开启 ⚡️')">
+                    <div class="grid-item-icon bg-[#FFF8E1] text-[#FFCA28]">🔔</div>
+                    <span class="text-[10px] font-bold text-gray-500">极速刷词</span>
+                </div>
+                <div class="flex flex-col items-center cursor-pointer active:scale-95 transition" onclick="showToast('本周测试报告生成中...')">
+                    <div class="grid-item-icon bg-[#ECEFF1] text-[#78909C]">📊</div>
+                    <span class="text-[10px] font-bold text-gray-500">进阶测试</span>
+                </div>
+            </div>
+
+            <div class="mt-6 mx-1 h-20 bg-gradient-to-r from-[#FFCC80] to-[#FFA726] rounded-2xl flex items-center px-4 relative overflow-hidden shadow-sm active:scale-[0.99] transition cursor-pointer" onclick="showToast('奖励已领取！+50 奶酪 🧀')">
+                <div class="z-10 text-white">
+                    <div class="font-bold text-lg shadow-sm">奶酪来发奖励啦!</div>
+                    <div class="text-xs bg-white/30 inline-block px-2 py-0.5 rounded mt-1">限时特惠</div>
+                </div>
+                <div class="absolute right-0 bottom-[-10px] text-6xl">🧀</div>
+                <div class="absolute right-14 top-2 text-white/50">✨</div>
+            </div>
+            
+            <div class="h-6"></div>
+        </div>
+
+        <!-- 底部导航栏 -->
+        <div class="bottom-nav h-20 absolute bottom-0 w-full flex justify-around items-center px-2 z-30">
+            <div class="nav-item flex flex-col items-center gap-1 cursor-pointer active" onclick="switchTab(this, 'home')">
+                <div class="w-10 h-10 bg-[#AED581] rounded-xl flex items-center justify-center text-white shadow-sm transition-colors duration-300">
+                    <i data-lucide="book-open" size="20"></i>
+                </div>
+                <span class="text-[10px] font-bold text-[#558B2F]">首页</span>
+            </div>
+
+            <div class="nav-item flex flex-col items-center gap-1 cursor-pointer opacity-60 hover:opacity-100" onclick="switchTab(this, 'study')">
+                <i data-lucide="graduation-cap" size="24" class="text-gray-400"></i>
+                <span class="text-[10px] font-bold text-gray-400">学习</span>
+            </div>
+
+            <div class="nav-item flex flex-col items-center gap-1 cursor-pointer -mt-8 hover:scale-105 transition" onclick="showToast('进入奇幻岛游戏世界 🏝')">
+                <div class="w-14 h-14 bg-[#FFCA28] rounded-full border-4 border-white flex items-center justify-center text-white shadow-lg">
+                    <i data-lucide="star" size="28" fill="white"></i>
+                </div>
+                <span class="text-[10px] font-bold text-gray-400 mt-1">奇幻</span>
+            </div>
+
+            <div class="nav-item flex flex-col items-center gap-1 cursor-pointer opacity-60 hover:opacity-100" onclick="switchTab(this, 'interest')">
+                <i data-lucide="compass" size="24" class="text-gray-400"></i>
+                <span class="text-[10px] font-bold text-gray-400">兴趣</span>
+            </div>
+
+            <div class="nav-item flex flex-col items-center gap-1 cursor-pointer opacity-60 hover:opacity-100" onclick="switchTab(this, 'profile')">
+                <i data-lucide="user" size="24" class="text-gray-400"></i>
+                <span class="text-[10px] font-bold text-gray-400">我的</span>
+            </div>
+        </div>
+
+        <div class="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gray-300 rounded-full z-40"></div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // 1. Toast 通知系统
+        let toastTimeout;
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            toastMsg.innerText = msg;
+            toast.classList.add('show');
+            
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // 2. 底部 Tab 切换逻辑
+        function switchTab(el, name) {
+            if(name === 'study' || name === 'interest' || name === 'profile') {
+                showToast(`已切换到 "${el.querySelector('span').innerText}" 页面`);
+            }
+            
+            // 移除其他激活状态
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                item.style.opacity = '0.6';
+                const iconContainer = item.querySelector('div');
+                if(iconContainer) {
+                   // iconContainer.style.backgroundColor = 'transparent';
+                }
+                const icon = item.querySelector('svg');
+                if(icon) {
+                    icon.style.stroke = "#9ca3af"; // gray-400
+                }
+                const text = item.querySelector('span');
+                if(text) text.classList.replace('text-[#558B2F]', 'text-gray-400');
+            });
+
+            // 激活当前
+            el.classList.add('active');
+            el.style.opacity = '1';
+            
+            // 特殊处理首页样式的还原
+            const icon = el.querySelector('svg');
+            if(icon) icon.style.stroke = "#558B2F";
+            
+            const text = el.querySelector('span');
+            if(text) text.classList.replace('text-gray-400', 'text-[#558B2F]');
+        }
+
+        // 3. 学习模式模态框
+        function startStudy() {
+            document.getElementById('studyModal').classList.add('open');
+        }
+
+        function closeStudyMode() {
+            document.getElementById('studyModal').classList.remove('open');
+            // 重置卡片翻转状态
+            setTimeout(() => {
+                document.querySelector('.flashcard').classList.remove('flipped');
+            }, 300);
+        }
+
+        function nextCard(known) {
+            showToast(known ? "太棒了！已掌握 +1" : "没关系，稍后复习");
+            // 简单的动画模拟切换卡片
+            const card = document.querySelector('.flashcard');
+            card.style.transform = "translateX(-120%) rotate(-10deg)";
+            card.style.opacity = "0";
+            
+            setTimeout(() => {
+                card.classList.remove('flipped'); // 重置翻面
+                card.style.transition = "none";
+                card.style.transform = "translateX(120%) rotate(10deg)";
+                
+                // 更换单词（模拟）
+                const words = [
+                    { en: "Sunflower", cn: "向日葵", emoji: "🌻" },
+                    { en: "Cheese", cn: "奶酪", emoji: "🧀" },
+                    { en: "Adventure", cn: "冒险", emoji: "🗺️" }
+                ];
+                const random = words[Math.floor(Math.random() * words.length)];
+                document.querySelector('.flashcard-front span:first-child').innerText = random.en;
+                document.querySelector('.flashcard-front div:last-child').innerText = random.emoji;
+                document.querySelector('.flashcard-back span:first-child').innerText = random.cn;
+
+                setTimeout(() => {
+                    card.style.transition = "transform 0.6s, opacity 0.6s";
+                    card.style.transform = "translateX(0) rotate(0)";
+                    card.style.opacity = "1";
+                }, 50);
+            }, 300);
+        }
+
+        // 4. 书籍与进度交互
+        const books = [
+            { title: "人教版一年级上", color: "#C5E1A5", border: "#AED581", lang: "英语" },
+            { title: "高等数学 (上)", color: "#90CAF9", border: "#64B5F6", lang: "数学" },
+            { title: "标准日本语初级", color: "#FFCC80", border: "#FFB74D", lang: "日语" }
+        ];
+        let currentBookIdx = 0;
+
+        function changeBook() {
+            currentBookIdx = (currentBookIdx + 1) % books.length;
+            const book = books[currentBookIdx];
+            
+            const cover = document.getElementById('book-cover');
+            const title = document.getElementById('book-title');
+            const lang = document.getElementById('book-lang');
+            
+            cover.style.backgroundColor = book.color;
+            cover.style.borderColor = book.border;
+            title.innerText = book.title;
+            lang.innerText = book.lang;
+            
+            // 随机重置进度
+            const randomProgress = Math.floor(Math.random() * 80) + 10;
+            document.getElementById('progress-bar').style.width = randomProgress + '%';
+            
+            showToast(`已切换至《${book.title}》`);
+        }
+
+        function resetProgress() {
+            document.getElementById('progress-bar').style.width = '0%';
+            showToast("学习进度已重置");
+        }
+
+        function incrementProgress() {
+            const bar = document.getElementById('progress-bar');
+            let w = parseInt(bar.style.width) || 33;
+            if (w < 100) {
+                bar.style.width = (w + 10) + '%';
+                showToast("复习完成，进度 +10% 🚀");
+            } else {
+                showToast("本单元已全部完成！🎉");
+            }
+        }
+
+        // 5. 铃铛通知
+        function toggleNotif(el) {
+            const dot = document.getElementById('notif-dot');
+            if(dot.style.display !== 'none') {
+                dot.style.display = 'none';
+                showToast("所有通知已标记为已读");
+            } else {
+                showToast("暂无新通知");
+            }
+        }
+        
+        // 初始化按钮波纹效果
+        document.querySelectorAll('.btn-primary, .btn-secondary').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                let ripple = document.createElement('span');
+                ripple.classList.add('ripple');
+                let x = e.clientX - e.target.offsetLeft;
+                let y = e.clientY - e.target.offsetTop;
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                this.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+    </script>
+</body>
+</html>

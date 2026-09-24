@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>轻拟物智能家居 UI</title>
+    <!-- 引入 Tailwind CSS 进行快速布局 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        /* 定义轻拟物风格的核心变量 */
+        :root {
+            --bg-color: #EBECF0;
+            --text-main: #585D6F;
+            --text-light: #9BAacf;
+            --shadow-light: #FFFFFF;
+            --shadow-dark: #BABECC;
+            --accent-orange: #FF9F43;
+            --accent-green: #2ECC71;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            user-select: none; /* 防止拖拽时选中文字 */
+        }
+
+        /* 核心：凸起效果 (Outset) */
+        .neu-out {
+            background: var(--bg-color);
+            box-shadow: 
+                7px 7px 14px var(--shadow-dark), 
+                -7px -7px 14px var(--shadow-light);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* 核心：凹陷效果 (Inset) - 用于滑块槽或按下的状态 */
+        .neu-in {
+            background: var(--bg-color);
+            box-shadow: 
+                inset 6px 6px 10px var(--shadow-dark), 
+                inset -6px -6px 10px var(--shadow-light);
+            border-radius: 20px;
+        }
+
+        /* 按钮按下的动态类 */
+        .btn-pressed:active, .btn-active {
+            box-shadow: 
+                inset 4px 4px 8px var(--shadow-dark), 
+                inset -4px -4px 8px var(--shadow-light);
+        }
+
+        /* 橙色激活状态 */
+        .icon-btn.active {
+            background: var(--accent-orange);
+            color: white;
+            box-shadow: 
+                inset 2px 2px 5px #d48233,
+                inset -2px -2px 5px #ffbc53;
+        }
+
+        /* 滑块特定样式 */
+        .slider-track {
+            position: relative;
+            width: 60px;
+            height: 240px;
+            border-radius: 30px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .slider-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(180deg, #FFB668 0%, #FF9F43 100%);
+            border-radius: 0 0 30px 30px; /* 底部圆角 */
+            pointer-events: none; /* 让点击事件穿透到 track */
+            transition: height 0.1s ease-out;
+        }
+        
+        /* 滑块顶部的光晕装饰，增加立体感 */
+        .slider-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 4px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        /* 开关 (Toggle) */
+        .toggle-switch {
+            width: 50px;
+            height: 26px;
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-thumb {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: var(--bg-color);
+            border-radius: 50%;
+            box-shadow: 2px 2px 4px var(--shadow-dark);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        .toggle-switch.on {
+            background: var(--accent-green);
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .toggle-switch.on .toggle-thumb {
+            left: 27px;
+            box-shadow: -1px 1px 3px rgba(0,0,0,0.2);
+        }
+
+        /* 刻度线装饰 */
+        .ruler-mark {
+            width: 12px;
+            height: 2px;
+            background: var(--shadow-dark);
+            margin: 6px 0;
+            border-radius: 1px;
+        }
+        
+        /* 隐藏移动端点击高亮 */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 主容器 -->
+    <div class="neu-out w-[360px] p-8 flex flex-col items-center relative">
+        
+        <!-- 标题 -->
+        <h1 class="text-2xl font-bold text-[#464858] mb-8 tracking-wide">Smart Home</h1>
+
+        <!-- 顶部图标栏 -->
+        <div class="flex justify-between w-full mb-10">
+            <!-- 每一个图标按钮 -->
+            <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="selectTab(this, 'thermometer')">
+                <div class="w-12 h-12 neu-out rounded-xl flex items-center justify-center text-[#9BAacf] transition-all icon-btn btn-pressed">
+                    <i data-lucide="thermometer" size="20"></i>
+                </div>
+                <span class="text-[10px] font-bold text-[#9BAacf]">Heating</span>
+            </div>
+
+            <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="selectTab(this, 'light')">
+                <!-- 默认激活状态 -->
+                <div class="w-12 h-12 neu-out rounded-xl flex items-center justify-center transition-all icon-btn btn-pressed active" id="btn-light">
+                    <i data-lucide="lightbulb" size="20"></i>
+                </div>
+                <span class="text-[10px] font-bold text-[#585D6F]">Light</span>
+            </div>
+
+            <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="selectTab(this, 'volume')">
+                <div class="w-12 h-12 neu-out rounded-xl flex items-center justify-center text-[#9BAacf] transition-all icon-btn btn-pressed">
+                    <i data-lucide="volume-2" size="20"></i>
+                </div>
+                <span class="text-[10px] font-bold text-[#9BAacf]">Sound</span>
+            </div>
+
+            <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="selectTab(this, 'tv')">
+                <div class="w-12 h-12 neu-out rounded-xl flex items-center justify-center text-[#9BAacf] transition-all icon-btn btn-pressed">
+                    <i data-lucide="tv" size="20"></i>
+                </div>
+                <span class="text-[10px] font-bold text-[#9BAacf]">Tv</span>
+            </div>
+             <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="selectTab(this, 'home')">
+                <div class="w-12 h-12 neu-out rounded-xl flex items-center justify-center text-[#9BAacf] transition-all icon-btn btn-pressed">
+                    <i data-lucide="home" size="20"></i>
+                </div>
+                <span class="text-[10px] font-bold text-[#9BAacf]">Other</span>
+            </div>
+        </div>
+
+        <!-- 中间灯泡图标装饰 -->
+        <div class="mb-6 text-[#9BAacf] opacity-50">
+            <i data-lucide="lightbulb" size="32" stroke-width="1.5"></i>
+        </div>
+
+        <!-- 滑块区域 -->
+        <div class="w-full flex justify-center items-center gap-8 mb-8 relative">
+            <!-- 左侧刻度 (装饰) -->
+            <div class="flex flex-col items-end opacity-30 h-[150px] justify-between">
+                <!-- 动态生成刻度 JS -->
+                <div class="text-xs font-bold text-[#585D6F] absolute left-10 top-[55%]" id="slider-text-floating">45%</div>
+                <div class="ruler-mark w-2"></div>
+                <div class="ruler-mark w-3"></div>
+                <div class="ruler-mark w-2"></div>
+                <div class="ruler-mark w-3"></div>
+                <div class="ruler-mark w-2"></div>
+                <div class="ruler-mark w-3"></div>
+                <div class="ruler-mark w-2"></div>
+                <div class="ruler-mark w-3"></div>
+            </div>
+
+            <!-- 垂直滑块 -->
+            <div class="neu-in slider-track" id="light-slider">
+                <div class="slider-fill" id="slider-fill" style="height: 45%;"></div>
+            </div>
+
+             <!-- 右侧平衡留白 (隐形占位) -->
+             <div class="w-[30px]"></div>
+        </div>
+
+        <!-- 底部控制区 -->
+        <div class="w-full grid grid-cols-2 gap-y-6 gap-x-4 mb-4">
+            
+            <!-- 当前亮度信息 -->
+            <div class="flex flex-col">
+                <span class="text-xs text-[#9BAacf] font-semibold mb-1">Current Light</span>
+                <div class="flex items-center gap-2 text-[#585D6F] font-bold text-lg">
+                    <i data-lucide="lightbulb" size="16"></i>
+                    <span id="percent-display">45%</span>
+                </div>
+            </div>
+
+            <!-- 开关 -->
+            <div class="flex flex-col items-end">
+                <span class="text-xs text-[#9BAacf] font-semibold mb-2">Turn On/Off</span>
+                <div class="neu-in toggle-switch on" id="main-toggle" onclick="toggleSwitch()">
+                    <div class="toggle-thumb"></div>
+                </div>
+            </div>
+
+            <!-- 自动模式按钮 -->
+            <button class="neu-out h-12 rounded-xl text-xs font-bold text-[#585D6F] btn-pressed flex items-center justify-center mt-2">
+                Automatic
+            </button>
+
+            <!-- 加减按钮 -->
+            <div class="flex items-center justify-between gap-3 mt-2">
+                <button class="neu-out w-12 h-12 rounded-xl flex items-center justify-center text-[#585D6F] btn-pressed" onclick="adjustValue(-5)">
+                    <i data-lucide="minus" size="16"></i>
+                </button>
+                <button class="neu-out w-12 h-12 rounded-xl flex items-center justify-center text-[#accent-orange] btn-pressed" style="color: var(--accent-orange)" onclick="adjustValue(5)">
+                    <i data-lucide="plus" size="16"></i>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 初始化图标
+        lucide.createIcons();
+
+        // 状态变量
+        let currentLevel = 45;
+        let isDragging = false;
+        
+        const sliderTrack = document.getElementById('light-slider');
+        const sliderFill = document.getElementById('slider-fill');
+        const percentDisplay = document.getElementById('percent-display');
+        const floatingText = document.getElementById('slider-text-floating');
+
+        // 更新 UI 的函数
+        function updateUI(level) {
+            // 限制范围 0-100
+            if (level < 0) level = 0;
+            if (level > 100) level = 100;
+            
+            currentLevel = Math.round(level);
+            
+            // 更新高度
+            sliderFill.style.height = `${currentLevel}%`;
+            
+            // 更新文字
+            percentDisplay.textContent = `${currentLevel}%`;
+            floatingText.textContent = `${currentLevel}%`;
+            
+            // 根据亮度调整文字位置（视觉效果）
+            // 简单的插值计算让文字跟随进度条大致位置，但保持在左侧
+            // let offset = 240 * (1 - currentLevel / 100); 
+            // floatingText.style.top = `calc(${offset}px + 20px)`; 
+        }
+
+        // 计算鼠标/触摸位置对应的百分比
+        function calculateLevel(clientY) {
+            const rect = sliderTrack.getBoundingClientRect();
+            const height = rect.height;
+            const bottom = rect.bottom;
+            
+            // 计算距离底部的距离
+            let distFromBottom = bottom - clientY;
+            
+            // 转换为百分比
+            let percentage = (distFromBottom / height) * 100;
+            
+            return percentage;
+        }
+
+        // 滑块交互事件监听
+        sliderTrack.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            updateUI(calculateLevel(e.clientY));
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                e.preventDefault(); // 防止选中文字
+                updateUI(calculateLevel(e.clientY));
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        // 触摸屏支持
+        sliderTrack.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            updateUI(calculateLevel(e.touches[0].clientY));
+        }, { passive: false });
+
+        document.addEventListener('touchmove', (e) => {
+            if (isDragging) {
+                e.preventDefault(); // 防止页面滚动
+                updateUI(calculateLevel(e.touches[0].clientY));
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        // 底部开关逻辑
+        function toggleSwitch() {
+            const toggle = document.getElementById('main-toggle');
+            toggle.classList.toggle('on');
+            
+            // 简单的开关灯效果逻辑
+            if (!toggle.classList.contains('on')) {
+                // 关灯样式
+                sliderFill.style.filter = 'grayscale(100%)';
+                document.getElementById('btn-light').classList.remove('active');
+                document.getElementById('btn-light').style.color = '#9BAacf';
+                document.getElementById('btn-light').style.background = '#EBECF0';
+                document.getElementById('btn-light').style.boxShadow = ''; // remove inset shadow logic manually if needed
+            } else {
+                // 开灯样式
+                sliderFill.style.filter = 'none';
+                // 恢复 Light 按钮的高亮状态
+                 const btn = document.getElementById('btn-light');
+                 btn.classList.add('active');
+                 btn.style.removeProperty('color');
+                 btn.style.removeProperty('background');
+            }
+        }
+
+        // 加减按钮逻辑
+        function adjustValue(delta) {
+            updateUI(currentLevel + delta);
+        }
+
+        // 顶部 Tab 切换逻辑
+        function selectTab(element, type) {
+            // 移除所有激活状态
+            const allBtns = document.querySelectorAll('.icon-btn');
+            allBtns.forEach(btn => {
+                btn.classList.remove('active');
+                // 恢复默认文本颜色
+                const label = btn.nextElementSibling;
+                if(label) label.classList.replace('text-[#585D6F]', 'text-[#9BAacf]');
+            });
+
+            // 激活当前点击的
+            const currentBtn = element.querySelector('.icon-btn');
+            currentBtn.classList.add('active');
+            
+            // 加深文字颜色
+            const currentLabel = element.querySelector('span');
+            currentLabel.classList.replace('text-[#9BAacf]', 'text-[#585D6F]');
+
+            // 可以在这里添加切换不同设备时的逻辑
+            console.log(`Switched to ${type}`);
+        }
+
+    </script>
+</body>
+</html>

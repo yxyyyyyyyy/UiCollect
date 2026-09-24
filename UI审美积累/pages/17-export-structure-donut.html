@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script>if(window.location.search.includes("thumb=1"))document.documentElement.classList.add("thumb-mode");</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2025 出口结构 · YXY 农业</title>
+  <style>/* Inlined common.css */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap');
+
+:root {
+  --font-main: 'Montserrat', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: 'Montserrat', sans-serif;
+  --font-serif: "Playfair Display", "Times New Roman", serif;
+  
+  /* Theme Colors */
+  --c-agri-dark: #0a1f13;
+  --c-agri-mid: #1b3d22;
+  --c-agri-accent: #6cd974;
+  --c-agri-gold: #e5b244;
+  
+  --c-oil-dark: #23160a;
+  --c-oil-mid: #4a3014;
+  --c-oil-amber: #f59e0b;
+  --c-oil-cream: #fef3c7;
+  
+  --c-meat-dark: #220e10;
+  --c-meat-mid: #44171b;
+  --c-meat-red: #ef4444;
+  --c-meat-coral: #f87171;
+  
+  --c-sugar-dark: #0b1a28;
+  --c-sugar-mid: #163650;
+  --c-sugar-cyan: #38bdf8;
+  --c-sugar-ice: #e0f2fe;
+
+  --c-bg-stone: #eae6df;
+  --c-bg-editorial: #151e18;
+  
+  /* Glassmorphism primitives */
+  --glass-bg: rgba(255, 255, 255, 0.12);
+  --glass-border: rgba(255, 255, 255, 0.22);
+  --glass-blur: blur(20px);
+  --glass-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.37);
+  --glass-inner-glow: inset 0 1px 0 0 rgba(255, 255, 255, 0.35);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-main);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #ffffff;
+  background-color: #0b0f0d;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Floating Showcase Navigation Bar for standalone pages */
+.showcase-topbar {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 16px 6px 12px;
+  background: rgba(15, 23, 19, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  font-size: 13px;
+  white-space: nowrap;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.showcase-topbar * {
+  box-sizing: border-box;
+}
+
+.showcase-topbar:hover {
+  background: rgba(15, 23, 19, 0.95);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+}
+
+.showcase-topbar .btn-back,
+.showcase-topbar .nav-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #e2e8f0;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  transition: background 0.2s, color 0.2s;
+  font-size: 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.showcase-topbar .btn-back svg,
+.showcase-topbar .nav-back svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.showcase-topbar .btn-back:hover,
+.showcase-topbar .nav-back:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+.showcase-topbar .divider {
+  width: 1px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.showcase-topbar .page-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #94a3b8;
+}
+
+.showcase-topbar .page-tag,
+.showcase-topbar .badge-page {
+  background: rgba(108, 217, 116, 0.15);
+  color: #6cd974;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.showcase-topbar .page-title {
+  color: #ffffff;
+  font-weight: 500;
+  max-width: 320px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+}
+
+.showcase-topbar .btn-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-decoration: none;
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.35);
+  transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+}
+
+.showcase-topbar .btn-download svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.showcase-topbar .btn-download:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.5);
+  filter: brightness(1.08);
+}
+
+.showcase-topbar .btn-download:active {
+  transform: translateY(0);
+}
+
+/* Glassmorphism standard component */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow), var(--glass-inner-glow);
+  border-radius: 16px;
+}
+
+/* Badges */
+.badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+}
+
+/* Utilities */
+.text-gradient-gold {
+  background: linear-gradient(135deg, #fef08a 0%, #eab308 50%, #ca8a04 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-green {
+  background: linear-gradient(135deg, #86efac 0%, #22c55e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Thumbnail / Screenshot Capture Mode (Pixel-perfect 1440x900 edge-to-edge) */
+.thumb-mode .showcase-topbar,
+body.thumb-mode .showcase-topbar,
+html.thumb-mode .showcase-topbar {
+  display: none !important;
+}
+
+html.thumb-mode,
+html.thumb-mode body {
+  width: 1440px !important;
+  height: 900px !important;
+  max-width: 1440px !important;
+  max-height: 900px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  display: block !important;
+  background: transparent !important;
+}
+
+html.thumb-mode body > *:not(.showcase-topbar):not(script),
+html.thumb-mode .cover-canvas,
+html.thumb-mode .chapter-card,
+html.thumb-mode .strategy-card,
+html.thumb-mode .tech-canvas,
+html.thumb-mode .tech-card-container,
+html.thumb-mode .key-results-canvas,
+html.thumb-mode .oil-intro-card,
+html.thumb-mode .meat-intro-card,
+html.thumb-mode .sugar-intro-card,
+html.thumb-mode .dash-frame,
+html.thumb-mode .dashboard-canvas,
+html.thumb-mode .infographic-stage,
+html.thumb-mode .quadrants-stage,
+html.thumb-mode .model-stage,
+html.thumb-mode .export-canvas {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  max-width: 1440px !important;
+  width: 1440px !important;
+  min-width: 1440px !important;
+  height: 900px !important;
+  min-height: 900px !important;
+  max-height: 900px !important;
+  border-radius: 0 !important;
+  border: none !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+
+
+</style>
+  <style>
+    body {
+      background: #0b110e;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #1e293b;
+    }
+
+    .export-canvas {
+      width: 100%;
+      max-width: 1400px;
+      height: 840px;
+      position: relative;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 35px 100px rgba(0, 0, 0, 0.9);
+      background: #475a45;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    /* Ambient foliage lighting */
+    .export-ambient-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
+                  linear-gradient(135deg, #3f523c 0%, #2f402d 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* The White Elegant Tablet Card from Mockup */
+    .white-editorial-card {
+      position: relative;
+      z-index: 10;
+      width: 680px;
+      height: 760px;
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 42px 48px;
+    }
+
+    /* Top Nav Row */
+    .card-nav-row {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .nav-pill-white {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 999px;
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #334155;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-pill-white .page-num {
+      background: #e2e8f0;
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .nav-pill-white .menu-icon {
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      width: 14px;
+    }
+
+    .nav-pill-white .menu-icon span {
+      display: block;
+      height: 2px;
+      background: #0f172a;
+      border-radius: 1px;
+    }
+
+    /* Card Title */
+    .card-title-text {
+      font-size: 15px;
+      font-weight: 600;
+      color: #0f172a;
+      line-height: 1.45;
+      margin-top: 15px;
+    }
+
+    /* Donut Stage with 6 Callouts */
+    .donut-stage {
+      position: relative;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .donut-center-wrap {
+      position: relative;
+      width: 320px;
+      height: 320px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .donut-center-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .donut-number {
+      font-size: 82px;
+      font-weight: 900;
+      color: #0f172a;
+      line-height: 0.9;
+      letter-spacing: -2px;
+    }
+
+    .donut-unit {
+      font-size: 15px;
+      font-weight: 800;
+      color: #64748b;
+      margin-top: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    /* 6 Radial Callout Items positioned around the donut */
+    .callout-tag {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.25;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .callout-tag .pct {
+      font-size: 19px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .callout-tag .region {
+      font-size: 11px;
+      font-weight: 500;
+      color: #64748b;
+    }
+
+    /* Coordinates for 6 positions */
+    /* 1. Top-Left: 30% 中国 */
+    .tag-china {
+      top: 18%;
+      left: 20px;
+      text-align: right;
+    }
+
+    /* 2. Top-Right: 21% 亚洲 */
+    .tag-asia {
+      top: 18%;
+      right: 20px;
+      text-align: left;
+    }
+
+    /* 3. Mid-Right: 15% 中东 */
+    .tag-mideast {
+      top: 50%;
+      right: 5px;
+      text-align: left;
+    }
+
+    /* 4. Bottom-Right: 14% 非洲国家 */
+    .tag-africa {
+      bottom: 12%;
+      right: 50px;
+      text-align: left;
+    }
+
+    /* 5. Bottom-Center: 11% 土耳其 */
+    .tag-turkey {
+      bottom: 5%;
+      left: 38%;
+      text-align: center;
+    }
+
+    /* 6. Mid-Left: 9% CIS */
+    .tag-cis {
+      top: 55%;
+      left: 20px;
+      text-align: right;
+    }
+
+    /* SVG Leader Lines */
+    .leader-lines-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .card-footer-note {
+      font-size: 11px;
+      color: #94a3b8;
+      text-align: center;
+    }
+  </style>
+<style>
+
+@media (max-width: 768px) {
+  .showcase-topbar {
+    top: 8px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: calc(100vw - 16px) !important;
+    max-width: 375px !important;
+    padding: 5px 8px !important;
+    gap: 6px !important;
+    font-size: 11px !important;
+    justify-content: space-between !important;
+    box-sizing: border-box !important;
+  }
+  .showcase-topbar .page-title,
+  .showcase-topbar .divider:nth-child(4) {
+    display: none !important;
+  }
+  .showcase-topbar .page-tag,
+  .showcase-topbar .badge-page {
+    font-size: 10px !important;
+    padding: 2px 6px !important;
+  }
+  .showcase-topbar .btn-download {
+    padding: 4px 10px !important;
+    font-size: 11px !important;
+    gap: 4px !important;
+  }
+  .showcase-topbar .btn-back,
+  .showcase-topbar .nav-back {
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+    gap: 4px !important;
+  }
+}
+
+</style>
+<style>
+
+@media (max-width: 900px) {
+  body { display: block !important; padding: 65px 10px 24px !important; }
+  .white-editorial-card { width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
+}
+
+</style>
+</head>
+<body>
+
+  <!-- Floating Showcase Navigation Bar -->
+  <header class="showcase-topbar">
+    <a href="../index.html" class="btn-back" onclick="if(location.protocol==='file:'){window.open('https://uicollect.yxyyy.top/','_blank');return false;}">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      画廊首页
+    </a>
+    <div class="divider"></div>
+    <div class="page-meta">
+      <span class="page-tag">PAGE 17 · 出口结构</span>
+      <span class="page-title">YXY 农业出口结构 · 67.7 万吨</span>
+    </div>
+    <div class="divider"></div>
+    <a href="17-export-structure-donut.html" download="17-export-structure-donut.html" class="btn-download">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      下载本页 HTML
+    </a>
+  </header>
+
+  <div class="export-canvas">
+    <div class="export-ambient-bg"></div>
+
+    <!-- The White Tablet Card -->
+    <div class="white-editorial-card">
+      <!-- Top Navigation -->
+      <div class="card-nav-row">
+        <div class="nav-pill-white">
+          <span>成果总览</span>
+          <span class="page-num">04</span>
+          <div class="menu-icon">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Header Title -->
+      <div class="card-title-text">
+        2025 年 YXY 农业出口目的地结构
+      </div>
+
+      <!-- Donut Stage with Callouts & Radial Lines -->
+      <div class="donut-stage">
+        <!-- SVG Leader Lines -->
+        <svg class="leader-lines-svg" viewBox="0 0 580 440">
+          <!-- Leader to China (top-left) -->
+          <polyline points="100,105 160,105 210,135" stroke="#cbd5e1" stroke-width="1.5" fill="none"/>
+          <!-- Leader to Asia (top-right) -->
+          <polyline points="470,105 410,105 370,135" stroke="#cbd5e1" stroke-width="1.5" fill="none"/>
+          <!-- Leader to Mid East (mid-right) -->
+          <polyline points="485,230 425,230 410,220" stroke="#cbd5e1" stroke-width="1.5" fill="none"/>
+          <!-- Leader to Africa (bottom-right) -->
+          <polyline points="460,360 400,360 365,330" stroke="#cbd5e1" stroke-width="1.5" fill="none"/>
+          <!-- Leader to Turkey (bottom-center) -->
+          <polyline points="290,400 290,370 290,355" stroke="#cbd5e1" stroke-width="1.5" fill="none"/>
+          <!-- Leader to CIS (mid-left) -->
+          <polyline points="95,250 155,250 170,240" stroke="#cbd5e1" stroke-width="1.5" fill="none"/>
+        </svg>
+
+        <!-- Callout Tags -->
+        <div class="callout-tag tag-china">
+          <span class="pct">30%</span>
+          <span class="region">中国</span>
+        </div>
+
+        <div class="callout-tag tag-asia">
+          <span class="pct">21%</span>
+          <span class="region">亚洲</span>
+        </div>
+
+        <div class="callout-tag tag-mideast">
+          <span class="pct">15%</span>
+          <span class="region">中东</span>
+        </div>
+
+        <div class="callout-tag tag-africa">
+          <span class="pct">14%</span>
+          <span class="region">非洲国家</span>
+        </div>
+
+        <div class="callout-tag tag-turkey">
+          <span class="pct">11%</span>
+          <span class="region">土耳其</span>
+        </div>
+
+        <div class="callout-tag tag-cis">
+          <span class="pct">9%</span>
+          <span class="region">CIS</span>
+        </div>
+
+        <!-- Center Donut Circle -->
+        <div class="donut-center-wrap">
+          <svg width="300" height="300" viewBox="0 0 300 300">
+            <!-- Donut Segments (Lime green, amber, yellow, deep green, teal, olive) -->
+            <!-- Circumference: 2 * pi * 125 = 785 -->
+            <circle cx="150" cy="150" r="125" fill="none" stroke="#e2e8f0" stroke-width="20" />
+            <!-- 30% China = 235.5 -->
+            <circle cx="150" cy="150" r="125" fill="none" stroke="#10b981" stroke-width="22" stroke-dasharray="235.5 785" transform="rotate(-150 150 150)" />
+            <!-- 21% Asia = 164.8 -->
+            <circle cx="150" cy="150" r="125" fill="none" stroke="#eab308" stroke-width="22" stroke-dasharray="164.8 785" stroke-dashoffset="-235.5" transform="rotate(-150 150 150)" />
+            <!-- 15% Mid East = 117.7 -->
+            <circle cx="150" cy="150" r="125" fill="none" stroke="#f59e0b" stroke-width="22" stroke-dasharray="117.7 785" stroke-dashoffset="-400.3" transform="rotate(-150 150 150)" />
+            <!-- 14% Africa = 109.9 -->
+            <circle cx="150" cy="150" r="125" fill="none" stroke="#84cc16" stroke-width="22" stroke-dasharray="109.9 785" stroke-dashoffset="-518" transform="rotate(-150 150 150)" />
+            <!-- 11% Turkey = 86.3 -->
+            <circle cx="150" cy="150" r="125" fill="none" stroke="#06b6d4" stroke-width="22" stroke-dasharray="86.3 785" stroke-dashoffset="-627.9" transform="rotate(-150 150 150)" />
+            <!-- 9% CIS = 70.6 -->
+            <circle cx="150" cy="150" r="125" fill="none" stroke="#059669" stroke-width="22" stroke-dasharray="70.6 785" stroke-dashoffset="-714.2" transform="rotate(-150 150 150)" />
+          </svg>
+
+          <div class="donut-center-text">
+            <div class="donut-number">677</div>
+            <div class="donut-unit">千吨</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer-note">
+        产品销往全球 35 个以上国家和地区
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

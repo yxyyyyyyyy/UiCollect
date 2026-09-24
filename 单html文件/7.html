@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>圣代 AI · 本地交互演示</title>
+  <style>
+    :root{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;color:#f7f0ed;background:#171b34}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:radial-gradient(circle at 20% 22%,#354268 0,transparent 38%),radial-gradient(circle at 87% 75%,#613e67 0,transparent 33%),#171b34}
+    button,input{font:inherit}
+    button{cursor:pointer}
+    .shell{max-width:1500px;margin:auto;min-height:100vh;display:grid;grid-template-columns:minmax(260px,31%) minmax(500px,1fr);gap:5vw;padding:36px 4vw}
+    .intro{display:flex;flex-direction:column;justify-content:space-between;padding:7px 0}
+    .brand{display:flex;align-items:center;gap:11px;font-size:13px;font-weight:700;letter-spacing:.15em}
+    .brand-mark{width:34px;height:34px;display:grid;place-items:center;border-radius:12px;background:linear-gradient(145deg,#f6dbc5,#b6b6e2);color:#4d4865;font-size:21px;box-shadow:0 8px 20px #0a102866}
+    .eyebrow{font-size:11px;letter-spacing:.27em;color:#c5bed8}
+    h1{font-size:clamp(45px,5vw,76px);line-height:1.15;letter-spacing:-.045em;font-weight:600;margin:21px 0}
+    h1 em{font-style:normal;background:linear-gradient(110deg,#f7dfbe,#dcacd1);color:transparent;background-clip:text}
+    .intro-copy{max-width:360px;line-height:1.9;color:#d3cde0;font-size:15px}
+    .intro-note{border-top:1px solid #ffffff24;padding-top:25px;color:#aaa9c3;font-size:12px;line-height:1.7;max-width:350px}
+    .demo{min-height:680px;display:grid;grid-template-rows:auto 1fr auto;background:#f8f5f1;color:#36334b;border:1px solid #ffffffa8;border-radius:28px;box-shadow:0 45px 90px #0c0e2855,0 8px 25px #0c0e2822;overflow:hidden}
+    .demo-header{padding:21px 26px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e8e2e0;gap:16px}
+    .demo-title{display:flex;align-items:center;gap:13px}
+    .face{width:45px;height:45px;display:grid;place-items:center;border-radius:15px;background:linear-gradient(145deg,#7f6caa,#d29ab6);box-shadow:inset 0 2px 4px #ffffff66,0 8px 17px #69558c35;font-size:24px;color:white;transform:rotate(-5deg)}
+    .demo-title strong{display:block;font-size:16px}
+    .demo-title small{display:block;font-size:11px;color:#898397;margin-top:4px}
+    .local-tag{border-radius:100px;padding:7px 11px;border:1px solid #dcd3db;background:#fff;color:#816977;font-size:11px;white-space:nowrap}
+    .chat{padding:34px 6%;overflow-y:auto;min-height:360px;max-height:calc(100vh - 265px);display:flex;flex-direction:column;gap:18px;background:radial-gradient(circle at 80% 5%,#eedbe750,transparent 45%)}
+    .message{max-width:min(78%,570px);padding:15px 18px;border-radius:18px;line-height:1.75;font-size:14px;white-space:pre-line;box-shadow:0 6px 19px #38304b0a}
+    .message.bot{align-self:flex-start;background:white;border:1px solid #eee6e8;border-top-left-radius:5px}
+    .message.user{align-self:flex-end;background:#685b89;color:white;border-top-right-radius:5px}
+    .message small{display:block;font-size:10px;letter-spacing:.08em;margin-bottom:5px;opacity:.68}
+    .composer{padding:15px 24px 22px;border-top:1px solid #e8e2e0;background:#fffdfb}
+    .suggestions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+    .suggestions button{border:1px solid #e4dbe1;background:#faf5f7;color:#6e6075;padding:7px 12px;border-radius:100px;font-size:12px;transition:.2s}
+    .suggestions button:hover{background:#eee4ed;border-color:#cab6cc}
+    form{display:flex;gap:10px}
+    #demo-chat-input{min-width:0;flex:1;border:1px solid #e2d9df;border-radius:14px;background:white;padding:15px 16px;outline:none;color:#3e3a48}
+    #demo-chat-input:focus{border-color:#a78db2;box-shadow:0 0 0 3px #a78db227}
+    form button{border:0;border-radius:14px;padding:0 22px;background:#5f557f;color:white;font-weight:700;transition:.2s}
+    form button:hover{background:#7b6997;transform:translateY(-1px)}
+    .disclaimer{font-size:10px;color:#9a92a0;text-align:center;margin:10px 0 0}
+    @media(max-width:900px){.shell{grid-template-columns:1fr;gap:24px;padding:20px}.intro{gap:20px}.intro-note{display:none}h1{font-size:42px}.demo{min-height:600px}.chat{max-height:470px}}
+    @media(max-width:560px){.shell{padding:12px}.intro{padding:7px}.intro-copy{font-size:13px}h1{font-size:36px;margin:9px 0}.demo{border-radius:20px;min-height:66vh}.demo-header{padding:14px}.chat{padding:17px;min-height:260px}.message{max-width:90%;font-size:13px}.composer{padding:12px}.suggestions{overflow-x:auto;flex-wrap:nowrap}.suggestions button{white-space:nowrap}form button{padding:0 15px}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="intro">
+      <div class="brand"><div class="brand-mark" aria-hidden="true">✦</div> 圣代 · 小小灵感室</div>
+      <div>
+        <div class="eyebrow">A LITTLE IDEA, A BETTER DAY</div>
+        <h1>把想法，<br><em>聊成下一步。</em></h1>
+        <p class="intro-copy">这是我做的一页对话界面练习。可以点选下方话题，也可以自己输入一句话，看看页面如何回应。</p>
+      </div>
+      <p class="intro-note">本地演示 · 这里展示的是预设对话与界面交互，没有接入在线 AI 服务。</p>
+    </section>
+    <section class="demo" aria-label="圣代对话演示">
+      <header class="demo-header">
+        <div class="demo-title"><div class="face" aria-hidden="true">✦</div><div><strong>圣代</strong><small>陪你整理小想法</small></div></div>
+        <span class="local-tag">● 本地演示</span>
+      </header>
+      <div id="chat" class="chat" role="log" aria-live="polite">
+        <div class="message bot"><small>圣代</small>你好呀。要不要从一个小问题开始？我可以陪你列思路、做清单，或者找一点今天的灵感。</div>
+      </div>
+      <div class="composer">
+        <div class="suggestions" aria-label="试试这些话题">
+          <button type="button" data-prompt="帮我安排今天的待办">安排待办</button>
+          <button type="button" data-prompt="给我一点设计灵感">设计灵感</button>
+          <button type="button" data-prompt="我想开始一个新项目">开始项目</button>
+        </div>
+        <form id="demo-chat-form">
+          <input id="demo-chat-input" type="text" maxlength="180" autocomplete="off" placeholder="写下一句想法…" aria-label="输入想法">
+          <button type="submit">发送 ↗</button>
+        </form>
+        <p class="disclaimer">此页面仅供作品展示；回复为本地预设内容，不会上传输入。</p>
+      </div>
+    </section>
+  </main>
+  <script>
+    const chat=document.getElementById('chat');
+    const form=document.getElementById('demo-chat-form');
+    const input=document.getElementById('demo-chat-input');
+    const replies=[
+      {test:/待办|计划|今天|安排/,text:'先把今天最重要的一件事写下来，再挑两件可以顺手完成的小事。\n① 最重要：留一段不被打断的时间。\n② 其次：把需要回复的人集中处理。\n③ 最后：给自己留一点休息。'},
+      {test:/设计|灵感|界面|配色/,text:'试试从一个具体感受开始：温柔、清爽，还是有一点戏剧感？先定一组颜色和一张有情绪的主视觉，再让排版为它让路。'},
+      {test:/项目|开始|作品/,text:'先做一个能打开的小版本：确定谁会用、最重要的一个动作是什么，再画出首页和结果页。完成第一轮后，再慢慢加细节。'}
+    ];
+    function addMessage(kind,value){
+      const message=document.createElement('div');
+      message.className='message '+kind;
+      const label=document.createElement('small');label.textContent=kind==='bot'?'圣代':'我';
+      message.append(label,document.createTextNode(value));
+      chat.append(message);chat.scrollTop=chat.scrollHeight;
+    }
+    function send(value){
+      const text=value.trim();if(!text)return;
+      addMessage('user',text);input.value='';
+      const reply=replies.find(item=>item.test.test(text));
+      window.setTimeout(()=>addMessage('bot',reply?reply.text:'我听到了你的想法。可以试着把它拆成三个小问题：现在最想解决什么？第一步能做什么？做到什么程度就算完成？'),360);
+    }
+    form.addEventListener('submit',event=>{event.preventDefault();send(input.value)});
+    document.querySelectorAll('[data-prompt]').forEach(button=>button.addEventListener('click',()=>send(button.dataset.prompt)));
+  </script>
+</body>
+</html>

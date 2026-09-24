@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Retro Diary UI - Full Set</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- 引入像素风格字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'retro-purple': '#6D28D9',      /* 深紫色背景 */
+                        'retro-purple-light': '#8B5CF6', /* 浅紫色装饰 */
+                        'acid-green': '#A3E635',         /* 酸性绿高亮 */
+                        'acid-green-dark': '#65A30D',    /* 绿色深部 */
+                        'cream-white': '#FDFBF7',        /* 米白背景 */
+                    },
+                    fontFamily: {
+                        'pixel': ['"VT323"', 'monospace'],
+                        'cute': ['"ZCOOL KuaiLe"', 'cursive', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'retro': '4px 4px 0px 0px #000000',
+                        'retro-sm': '2px 2px 0px 0px #000000',
+                        'retro-lg': '6px 6px 0px 0px #000000',
+                        'retro-hover': '2px 2px 0px 0px #000000',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #5b21b6;
+            background-image: 
+                linear-gradient(45deg, #4c1d95 25%, transparent 25%, transparent 75%, #4c1d95 75%, #4c1d95),
+                linear-gradient(45deg, #4c1d95 25%, transparent 25%, transparent 75%, #4c1d95 75%, #4c1d95);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .pixel-border { border: 3px solid #000; }
+        
+        /* 按钮按下效果 */
+        .retro-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px 0px #000000;
+        }
+
+        /* 虚线边框 */
+        .dashed-border {
+            background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='16' ry='16' stroke='%23000000FF' stroke-width='3' stroke-dasharray='12%2c 12' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+        }
+        
+        /* 状态栏通用样式 */
+        .status-bar {
+            height: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px;
+            color: white;
+            font-family: 'VT323', monospace;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        
+        /* 导航栏通用样式 */
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 16px;
+            color: white;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex items-center justify-center">
+
+    <!-- 容器：2行4列，展示8个界面 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-[1400px]">
+
+        <!-- Screen 1: Home / No Diary -->
+        <div class="pixel-border bg-retro-purple rounded-[2rem] overflow-hidden aspect-[9/18] flex flex-col relative shadow-retro-lg transform hover:-translate-y-1 transition-transform duration-300">
+            <div class="status-bar">
+                <span>10:42</span>
+                <div class="flex gap-1"><i class="fas fa-signal"></i><i class="fas fa-wifi"></i><i class="fas fa-battery-full"></i></div>
+            </div>
+            <div class="nav-bar">
+                <i class="fas fa-bars text-xl"></i>
+                <h1 class="font-cute text-lg tracking-widest">我的日记本</h1>
+                <i class="fas fa-calendar-alt text-xl"></i>
+            </div>
+            <div class="flex-1 bg-cream-white m-4 mb-20 rounded-[1.5rem] pixel-border shadow-retro flex flex-col items-center justify-center relative p-6">
+                <div class="absolute top-3 right-3 flex gap-1">
+                    <div class="w-2 h-2 rounded-full bg-black border border-black"></div>
+                    <div class="w-2 h-2 rounded-full border-2 border-black"></div>
+                </div>
+                <div class="relative w-40 h-40 mb-6">
+                    <div class="absolute inset-0 bg-acid-green rounded-full pixel-border flex items-center justify-center shadow-retro">
+                        <div class="font-pixel text-8xl font-bold text-retro-purple drop-shadow-[4px_4px_0_#000]">NO</div>
+                    </div>
+                    <div class="absolute -top-2 -left-2 text-2xl animate-bounce">🤔</div>
+                    <div class="absolute -bottom-2 -right-2 text-2xl animate-pulse">😡</div>
+                </div>
+                <p class="font-cute text-gray-700 text-lg mb-8">您还没有日记哦~</p>
+                <button class="retro-btn w-16 h-16 bg-acid-green rounded-2xl pixel-border flex items-center justify-center shadow-retro absolute -bottom-8">
+                    <i class="fas fa-plus text-3xl text-black"></i>
+                </button>
+            </div>
+             <div class="mt-auto mb-6 flex justify-center">
+                <div class="bg-black text-acid-green px-4 py-1 rounded-full text-xs font-cute border-2 border-white/20">
+                    一款属于像素设计的黑马
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 2: Write Diary (New) -->
+        <div class="pixel-border bg-retro-purple rounded-[2rem] overflow-hidden aspect-[9/18] flex flex-col relative shadow-retro-lg transform hover:-translate-y-1 transition-transform duration-300">
+            <div class="status-bar">
+                <span>10:42</span>
+                <div class="flex gap-1"><i class="fas fa-signal"></i><i class="fas fa-wifi"></i><i class="fas fa-battery-full"></i></div>
+            </div>
+            <div class="nav-bar">
+                <i class="fas fa-chevron-left text-xl"></i>
+                <h1 class="font-cute text-lg flex-1 text-center">记录今天的日记</h1>
+                <i class="fas fa-save text-xl"></i>
+            </div>
+            <div class="flex-1 px-4 pb-4 flex flex-col overflow-hidden">
+                <!-- Mood Bar -->
+                <div class="bg-cream-white pixel-border rounded-2xl p-4 shadow-retro mb-4 flex flex-col items-center">
+                    <div class="bg-acid-green px-3 py-1 rounded-full pixel-border text-xs font-bold mb-3 -mt-7 shadow-retro-sm">今天心情</div>
+                    <div class="flex justify-between items-center w-full gap-2">
+                        <div class="w-10 h-10 border-2 border-dashed border-black rounded-lg flex items-center justify-center bg-yellow-200">😃</div>
+                        <div class="w-10 h-10 border-2 border-black rounded-lg flex items-center justify-center bg-white hover:bg-gray-100">🤣</div>
+                        <div class="w-10 h-10 border-2 border-black rounded-lg flex items-center justify-center bg-white hover:bg-gray-100">😡</div>
+                        <i class="fas fa-chevron-right text-gray-400"></i>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2 font-cute">今天心情很开心</p>
+                </div>
+
+                <!-- Text Area -->
+                <div class="bg-cream-white pixel-border rounded-2xl p-4 shadow-retro flex-1 flex flex-col relative mb-4">
+                     <div class="bg-acid-green px-3 py-1 rounded-full pixel-border text-xs font-bold absolute left-1/2 -translate-x-1/2 -top-3 shadow-retro-sm">写日记</div>
+                     <textarea class="w-full h-full bg-transparent resize-none outline-none font-cute text-gray-700 mt-2 placeholder-gray-300" placeholder="今天发生了什么值得纪念的事情了吗？在这里写一写，记录精彩的瞬间~"></textarea>
+                </div>
+
+                <button class="w-full bg-acid-green pixel-border rounded-xl py-3 font-cute font-bold shadow-retro text-lg retro-btn">
+                    保存日记
+                </button>
+            </div>
+        </div>
+
+        <!-- Screen 3: Mood Selector -->
+        <div class="pixel-border bg-retro-purple rounded-[2rem] overflow-hidden aspect-[9/18] flex flex-col relative shadow-retro-lg transform hover:-translate-y-1 transition-transform duration-300">
+            <div class="status-bar">
+                <span>10:42</span>
+                <div class="flex gap-1"><i class="fas fa-signal"></i><i class="fas fa-wifi"></i><i class="fas fa-battery-full"></i></div>
+            </div>
+            <div class="nav-bar">
+                <i class="fas fa-chevron-left text-xl"></i>
+                <h1 class="font-cute text-lg flex-1 text-center">心情设置</h1>
+                <div class="w-5"></div>
+            </div>
+            <div class="flex-1 px-4 pb-4 overflow-y-auto no-scrollbar">
+                <div class="grid grid-cols-2 gap-4">
+                    <button class="retro-btn bg-acid-green pixel-border rounded-2xl p-4 flex flex-col items-center justify-center shadow-retro aspect-square group">
+                        <div class="text-5xl mb-2 transform group-hover:scale-110 transition-transform">😃</div>
+                        <span class="font-cute font-bold text-black">开心</span>
+                    </button>
+                    <button class="retro-btn bg-cream-white pixel-border rounded-2xl p-4 flex flex-col items-center justify-center shadow-retro aspect-square hover:bg-acid-green transition-colors">
+                        <div class="text-5xl mb-2">🤣</div>
+                        <span class="font-cute font-bold text-black">大笑</span>
+                    </button>
+                    <button class="retro-btn bg-cream-white pixel-border rounded-2xl p-4 flex flex-col items-center justify-center shadow-retro aspect-square hover:bg-acid-green transition-colors">
+                        <div class="text-5xl mb-2">😉</div>
+                        <span class="font-cute font-bold text-black">调皮</span>
+                    </button>
+                    <button class="retro-btn bg-cream-white pixel-border rounded-2xl p-4 flex flex-col items-center justify-center shadow-retro aspect-square hover:bg-acid-green transition-colors">
+                        <div class="text-5xl mb-2">😡</div>
+                        <span class="font-cute font-bold text-black">愤怒</span>
+                    </button>
+                    <button class="retro-btn bg-cream-white pixel-border rounded-2xl p-4 flex flex-col items-center justify-center shadow-retro aspect-square hover:bg-acid-green transition-colors">
+                        <div class="text-5xl mb-2">😍</div>
+                        <span class="font-cute font-bold text-black">好美</span>
+                    </button>
+                    <button class="retro-btn bg-cream-white pixel-border rounded-2xl p-4 flex flex-col items-center justify-center shadow-retro aspect-square hover:bg-acid-green transition-colors">
+                        <div class="text-5xl mb-2">😓</div>
+                        <span class="font-cute font-bold text-black">失望</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 4: Diary List -->
+        <div class="pixel-border bg-retro-purple rounded-[2rem] overflow-hidden aspect-[9/18] flex flex-col relative shadow-retro-lg transform hover:-translate-y-1 transition-transform duration-300">
+            <div class="status-bar">
+                <span>10:42</span>
+                <div class="flex gap-1"><i class="fas fa-signal"></i><i class="fas fa-wifi"></i><i class="fas fa-battery-full"></i></div>
+            </div>
+            <div class="nav-bar">
+                <i class="fas fa-bars text-xl"></i>
+                <h1 class="font-cute text-lg flex-1 text-center">我的日记本</h1>
+                <div class="bg-acid-green text-black w-6 h-6 flex items-center justify-center rounded pixel-border text-xs font-bold"><i class="fas fa-check"></i></div>
+            </div>
+            <div class="flex-1 px-4 space-y-4 overflow-y-auto no-scrollbar pb-6">
+                <div class="bg-cream-white pixel-border rounded-2xl p-3 shadow-retro flex gap-3 transform hover:scale-[1.02] transition-transform">
+                    <div class="flex flex-col items-center gap-1">
+                        <div class="text-3xl bg-yellow-200 rounded-full border-2 border-black p-1">😃</div>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-cute font-bold text-sm leading-tight mb-2">今天很开心，终于毕业啦！和朋友聚餐吃火锅，超级努力！</h3>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-[10px] text-gray-400 font-pixel">20:30</span>
+                            <div class="flex gap-2">
+                                <button class="bg-acid-green px-2 py-0.5 rounded border border-black text-[10px] font-bold shadow-[1px_1px_0_0_#000]">心情</button>
+                                <button class="bg-acid-green px-2 py-0.5 rounded border border-black text-[10px] font-bold shadow-[1px_1px_0_0_#000]">分享</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-cream-white pixel-border rounded-2xl p-3 shadow-retro flex gap-3 transform hover:scale-[1.02] transition-transform">
+                    <div class="flex flex-col items-center gap-1">
+                        <div class="text-3xl bg-red-200 rounded-full border-2 border-black p-1">😡</div>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-cute font-bold text-sm leading-tight mb-2">遇到了一件很愤怒的事情，是甘霖娘的一天，我焯...</h3>
+                         <div class="flex justify-between items-center mt-2">
+                            <span class="text-[10px] text-gray-400 font-pixel">18:15</span>
+                            <div class="flex gap-2">
+                                <button class="bg-acid-green px-2 py-0.5 rounded border border-black text-[10px] font-bold shadow-[1px_1px_0_0_#000]">心情</button>
+                                <button class="bg-acid-green px-2 py-0.5 rounded border border-black text-[10px] font-bold shadow-[1px_1px_0_0_#000]">分享</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <div class="bg-cream-white pixel-border rounded-2xl p-3 shadow-retro flex gap-3 transform hover:scale-[1.02] transition-transform">
+                    <div class="flex flex-col items-center gap-1">
+                        <div class="text-3xl bg-blue-200 rounded-full border-2 border-black p-1">😭</div>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-cute font-bold text-sm leading-tight mb-2">伤心的一天，出门门票掉了一地，这糟糕的 PG 呀！</h3>
+                         <div class="flex justify-between items-center mt-2">
+                            <span class="text-[10px] text-gray-400 font-pixel">09:42</span>
+                            <div class="flex gap-2">
+                                <button class="bg-acid-green px-2 py-0.5 rounded border border-black text-[10px] font-bold shadow-[1px_1px_0_0_#000]">心情</button>
+                                <button class="bg-acid-green px-2 py-0.5 rounded border border-black text-[10px] font-bold shadow-[1px_1px_0_0_#000]">分享</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <div class="bg-cream-white pixel-border rounded-2xl p-3 shadow-retro flex gap-3 transform hover:scale-[1.02] transition-transform">
+                    <div class="flex flex-col items-center gap-1">
+                        <div class="text-3xl bg-gray-200 rounded-full border-2 border-black p-1">😓</div>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-cute font-bold text-sm leading-tight mb-2">一个多小时终于把花露水画该完水了，结果下雨啦！！！</h3>
+                         <div class="flex justify-between items-center mt-2">
+                            <span class="text-[10px] text-gray-400 font-pixel">08:15</span>
+                            <div class="flex gap-2">
+                                <button class="bg-acid-green px-2 py-0.5 rounded border border-black text-[10px] font-bold shadow-[1px_1px_0_0_#000]">心情</button>
+                                <button class="bg-acid-green px-2 py-0.5 rounded border border-black text-[10px] font-bold shadow-[1px_1px_0_0_#000]">分享</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 5: Personal Center -->
+        <div class="pixel-border bg-retro-purple rounded-[2rem] overflow-hidden aspect-[9/18] flex flex-col relative shadow-retro-lg transform hover:-translate-y-1 transition-transform duration-300">
+             <div class="status-bar">
+                <span>10:42</span>
+                <div class="flex gap-1"><i class="fas fa-signal"></i><i class="fas fa-wifi"></i><i class="fas fa-battery-full"></i></div>
+            </div>
+            <div class="nav-bar">
+                <i class="fas fa-times text-xl"></i>
+                <h1 class="font-cute text-lg flex-1 text-center">个人中心</h1>
+                <i class="fas fa-cog text-xl"></i>
+            </div>
+            <div class="flex-1 px-4">
+                <div class="bg-cream-white pixel-border rounded-2xl p-4 shadow-retro mb-6 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-black rounded-lg pixel-border border-white overflow-hidden">
+                            <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=Felix" alt="avatar" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h2 class="font-cute font-bold text-lg">黑马青年</h2>
+                            <p class="text-[10px] text-gray-500">我的ID: Pixel-888</p>
+                        </div>
+                    </div>
+                    <button class="bg-acid-green text-xs font-bold px-3 py-1 rounded-full border-2 border-black flex items-center gap-1 shadow-retro-sm">
+                        <i class="fas fa-heart text-xs"></i> 会员
+                    </button>
+                </div>
+
+                <div class="bg-cream-white pixel-border rounded-2xl shadow-retro overflow-hidden">
+                    <div class="p-3 border-b-2 border-black/10 flex items-center justify-between hover:bg-gray-50 cursor-pointer group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded bg-acid-green border-2 border-black flex items-center justify-center text-sm group-hover:rotate-12 transition-transform"><i class="fas fa-home"></i></div>
+                            <span class="font-cute font-bold">首页</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-xs"></i>
+                    </div>
+                    <div class="p-3 border-b-2 border-black/10 flex items-center justify-between hover:bg-gray-50 cursor-pointer group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded bg-acid-green border-2 border-black flex items-center justify-center text-sm group-hover:-rotate-12 transition-transform"><i class="fas fa-book"></i></div>
+                            <span class="font-cute font-bold">写日记</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-xs"></i>
+                    </div>
+                    <div class="p-3 border-b-2 border-black/10 flex items-center justify-between hover:bg-gray-50 cursor-pointer group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded bg-acid-green border-2 border-black flex items-center justify-center text-sm group-hover:rotate-12 transition-transform"><i class="fas fa-bell"></i></div>
+                            <span class="font-cute font-bold">消息通知</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-xs"></i>
+                    </div>
+                     <div class="p-3 border-b-2 border-black/10 flex items-center justify-between hover:bg-gray-50 cursor-pointer group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded bg-acid-green border-2 border-black flex items-center justify-center text-sm group-hover:-rotate-12 transition-transform"><i class="fas fa-qrcode"></i></div>
+                            <span class="font-cute font-bold">扫一扫</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-xs"></i>
+                    </div>
+                     <div class="p-3 flex items-center justify-between hover:bg-gray-50 cursor-pointer group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded bg-acid-green border-2 border-black flex items-center justify-center text-sm group-hover:rotate-12 transition-transform"><i class="fas fa-rocket"></i></div>
+                            <span class="font-cute font-bold">活动中心</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-xs"></i>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <button class="w-full bg-yellow-400 pixel-border rounded-xl py-3 font-cute font-bold shadow-retro flex items-center justify-between px-4 retro-btn">
+                        <i class="fas fa-arrow-right bg-white border-2 border-black rounded-full w-6 h-6 flex items-center justify-center text-[10px]"></i>
+                        <span>完成任务赚取会员特权</span>
+                        <i class="fas fa-angle-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 6: Activity Detail (New - Rocket) -->
+        <div class="pixel-border bg-retro-purple rounded-[2rem] overflow-hidden aspect-[9/18] flex flex-col relative shadow-retro-lg transform hover:-translate-y-1 transition-transform duration-300">
+            <div class="status-bar">
+                <span>10:42</span>
+                <div class="flex gap-1"><i class="fas fa-signal"></i><i class="fas fa-wifi"></i><i class="fas fa-battery-full"></i></div>
+            </div>
+            <div class="nav-bar">
+                <i class="fas fa-chevron-left text-xl"></i>
+                <h1 class="font-cute text-lg flex-1 text-center">活动详情</h1>
+                <i class="fas fa-share-alt text-xl"></i>
+            </div>
+            
+            <div class="flex-1 px-4 pb-6 flex flex-col">
+                <!-- Big Activity Card -->
+                <div class="bg-cream-white pixel-border rounded-2xl flex-1 shadow-retro relative overflow-hidden p-4 flex flex-col items-center">
+                    <!-- Dots decoration -->
+                    <div class="flex gap-2 mb-4 bg-acid-green px-4 py-1 rounded-full pixel-border shadow-retro-sm">
+                        <div class="w-3 h-3 rounded-full border-2 border-black bg-white"></div>
+                        <div class="w-3 h-3 rounded-full border-2 border-black bg-white"></div>
+                        <div class="w-3 h-3 rounded-full border-2 border-black bg-white"></div>
+                        <div class="w-3 h-3 rounded-full border-2 border-black bg-white"></div>
+                        <div class="w-3 h-3 rounded-full border-2 border-black bg-white"></div>
+                    </div>
+
+                    <!-- Title Banner -->
+                    <div class="relative w-full mb-8">
+                        <div class="bg-acid-green pixel-border py-4 px-2 text-center shadow-retro rounded-xl transform -rotate-2">
+                            <h2 class="font-cute font-black text-3xl tracking-wide stroke-black">免 费 体 验</h2>
+                            <p class="text-xs font-bold mt-1 bg-black text-white inline-block px-2 rounded">限时解锁全部会员权益</p>
+                        </div>
+                        <div class="absolute -left-2 top-0 text-3xl animate-bounce">😃</div>
+                        <div class="absolute -right-2 bottom-0 text-3xl animate-pulse">🥰</div>
+                    </div>
+
+                    <!-- Rocket Illustration -->
+                    <div class="relative flex-1 w-full flex items-center justify-center">
+                        <i class="fas fa-rocket text-8xl text-acid-green drop-shadow-[4px_4px_0_#000] transform -rotate-45 relative z-10"></i>
+                        <!-- Clouds -->
+                        <i class="fas fa-cloud text-5xl text-gray-200 absolute top-10 left-4 border-black drop-shadow-[2px_2px_0_#000]"></i>
+                        <i class="fas fa-cloud text-4xl text-gray-200 absolute bottom-20 right-4 border-black drop-shadow-[2px_2px_0_#000]"></i>
+                        <!-- Stars -->
+                        <i class="fas fa-star text-yellow-400 absolute top-0 right-10 text-xl animate-spin"></i>
+                        <i class="fas fa-star text-yellow-400 absolute bottom-10 left-10 text-xl animate-spin"></i>
+                    </div>
+
+                    <!-- Footer Info -->
+                    <div class="w-full bg-retro-purple p-3 rounded-xl pixel-border text-white text-xs space-y-1">
+                        <div class="flex gap-2">
+                            <span class="bg-black px-1 rounded">活动时间</span>
+                            <span>2024.10.01-10.07</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="bg-black px-1 rounded">活动规则</span>
+                            <span>完成全部任务即可解锁权益</span>
+                        </div>
+                        <div class="absolute right-2 bottom-2 bg-white p-1 rounded border-2 border-black">
+                             <i class="fas fa-qrcode text-2xl text-black"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 7: Notification (New) -->
+        <div class="pixel-border bg-retro-purple rounded-[2rem] overflow-hidden aspect-[9/18] flex flex-col relative shadow-retro-lg transform hover:-translate-y-1 transition-transform duration-300">
+            <div class="status-bar">
+                <span>10:42</span>
+                <div class="flex gap-1"><i class="fas fa-signal"></i><i class="fas fa-wifi"></i><i class="fas fa-battery-full"></i></div>
+            </div>
+            <div class="nav-bar">
+                <i class="fas fa-chevron-left text-xl"></i>
+                <h1 class="font-cute text-lg flex-1 text-center">消息通知</h1>
+                <i class="fas fa-bell text-xl"></i>
+            </div>
+            
+            <div class="flex-1 px-4 pb-4">
+                <div class="bg-cream-white pixel-border rounded-2xl shadow-retro h-full overflow-y-auto no-scrollbar p-2">
+                    <!-- Msg Item -->
+                    <div class="p-3 border-b-2 border-dashed border-gray-300 flex gap-3 hover:bg-gray-50">
+                        <div class="w-10 h-10 rounded bg-acid-green border-2 border-black flex items-center justify-center shrink-0">
+                            <i class="fas fa-comment-dots"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-cute font-bold text-sm">应用福利来袭！</h3>
+                                <span class="text-[10px] text-gray-400 font-pixel">11:24 AM</span>
+                            </div>
+                            <p class="text-[10px] text-gray-500 line-clamp-1 mt-1">恭喜您获得了一张高级会员体验卡...</p>
+                        </div>
+                    </div>
+                    <!-- Msg Item -->
+                    <div class="p-3 border-b-2 border-dashed border-gray-300 flex gap-3 hover:bg-gray-50">
+                        <div class="w-10 h-10 rounded bg-yellow-200 border-2 border-black flex items-center justify-center shrink-0">
+                            <i class="fas fa-ghost"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-cute font-bold text-sm">中秋节活动</h3>
+                                <span class="text-[10px] text-gray-400 font-pixel">10:00 AM</span>
+                            </div>
+                            <p class="text-[10px] text-gray-500 line-clamp-1 mt-1">8月15月儿圆，快来参加...</p>
+                        </div>
+                    </div>
+                    <!-- Msg Item -->
+                    <div class="p-3 border-b-2 border-dashed border-gray-300 flex gap-3 hover:bg-gray-50">
+                        <div class="w-10 h-10 rounded bg-blue-200 border-2 border-black flex items-center justify-center shrink-0">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="flex-1">
+                             <div class="flex justify-between items-start">
+                                <h3 class="font-cute font-bold text-sm">会员特权</h3>
+                                <span class="text-[10px] text-gray-400 font-pixel">昨天</span>
+                            </div>
+                            <p class="text-[10px] text-gray-500 line-clamp-1 mt-1">会员专属装扮已上线，请查收！</p>
+                        </div>
+                    </div>
+                    <!-- Msg Item -->
+                     <div class="p-3 border-b-2 border-dashed border-gray-300 flex gap-3 hover:bg-gray-50">
+                        <div class="w-10 h-10 rounded bg-gray-200 border-2 border-black flex items-center justify-center shrink-0">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="flex-1">
+                             <div class="flex justify-between items-start">
+                                <h3 class="font-cute font-bold text-sm">系统通知</h3>
+                                <span class="text-[10px] text-gray-400 font-pixel">09-28</span>
+                            </div>
+                            <p class="text-[10px] text-gray-500 line-clamp-1 mt-1">系统已完成更新维护。</p>
+                        </div>
+                    </div>
+                    <!-- Msg Item -->
+                     <div class="p-3 flex gap-3 hover:bg-gray-50">
+                        <div class="w-10 h-10 rounded bg-acid-green border-2 border-black flex items-center justify-center shrink-0">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="flex-1">
+                             <div class="flex justify-between items-start">
+                                <h3 class="font-cute font-bold text-sm">开学季活动来袭！</h3>
+                                <span class="text-[10px] text-gray-400 font-pixel">09-01</span>
+                            </div>
+                            <p class="text-[10px] text-gray-500 line-clamp-1 mt-1">为广大学生党准备的超级福利...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+             <div class="mt-auto mb-6 flex justify-center">
+                <div class="bg-black text-acid-green px-4 py-1 rounded-full text-xs font-cute border-2 border-white/20">
+                    一款属于像素设计的黑马
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 8: Gender Settings (New) -->
+        <div class="pixel-border bg-retro-purple rounded-[2rem] overflow-hidden aspect-[9/18] flex flex-col relative shadow-retro-lg transform hover:-translate-y-1 transition-transform duration-300">
+            <div class="status-bar">
+                <span>10:42</span>
+                <div class="flex gap-1"><i class="fas fa-signal"></i><i class="fas fa-wifi"></i><i class="fas fa-battery-full"></i></div>
+            </div>
+            <div class="nav-bar">
+                <i class="fas fa-chevron-left text-xl"></i>
+                <h1 class="font-cute text-lg flex-1 text-center">账户设置</h1>
+                <i class="fas fa-cog text-xl"></i>
+            </div>
+            
+            <div class="flex-1 px-4 pb-8 flex flex-col">
+                <div class="bg-cream-white pixel-border rounded-2xl flex-1 shadow-retro p-6 flex flex-col items-center relative overflow-hidden">
+                     <!-- Top dots -->
+                    <div class="absolute top-3 right-3 flex gap-1">
+                        <div class="w-2 h-2 rounded-full border-2 border-black"></div>
+                        <div class="w-2 h-2 rounded-full border-2 border-black"></div>
+                        <div class="w-2 h-2 rounded-full border-2 border-black"></div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="w-full mb-6">
+                        <div class="flex justify-between text-xs font-bold mb-1">
+                            <span>1/4</span>
+                            <span class="text-gray-400">点击进入下一步</span>
+                        </div>
+                        <div class="h-3 bg-gray-200 rounded-full border-2 border-black overflow-hidden">
+                            <div class="h-full w-1/4 bg-acid-green border-r-2 border-black"></div>
+                        </div>
+                    </div>
+
+                    <h2 class="font-cute font-black text-2xl mb-2 text-center w-full">请选择您的性别</h2>
+                    <p class="text-xs text-gray-400 mb-8">选择性别，我们会给您更好的个性化体验</p>
+
+                    <!-- Selection Buttons -->
+                    <div class="w-full space-y-4">
+                        <button class="w-full bg-acid-green pixel-border rounded-2xl h-24 flex items-center justify-center gap-4 shadow-retro retro-btn group">
+                            <div class="w-12 h-12 border-2 border-black rounded-xl bg-cream-white flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                                <i class="fas fa-mars text-blue-500"></i>
+                            </div>
+                            <span class="font-cute font-black text-xl">我是男生</span>
+                        </button>
+
+                        <button class="w-full bg-white pixel-border rounded-2xl h-24 flex items-center justify-center gap-4 shadow-retro retro-btn group hover:bg-gray-50">
+                            <div class="w-12 h-12 border-2 border-black rounded-xl bg-cream-white flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                                <i class="fas fa-venus text-pink-500"></i>
+                            </div>
+                            <span class="font-cute font-black text-xl">我是女生</span>
+                        </button>
+                    </div>
+
+                    <!-- Bottom wave -->
+                     <div class="absolute bottom-0 left-0 right-0 h-4 bg-acid-green border-t-2 border-black opacity-50"></div>
+                     <div class="absolute bottom-2 left-0 right-0 h-4 bg-acid-green border-t-2 border-black"></div>
+                </div>
+            </div>
+             <div class="mt-auto mb-6 flex justify-center">
+                <div class="bg-black text-acid-green px-4 py-1 rounded-full text-xs font-cute border-2 border-white/20">
+                    一款属于像素设计的黑马+我的账号
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
